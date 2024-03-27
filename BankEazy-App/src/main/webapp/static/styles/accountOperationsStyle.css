@@ -1,0 +1,93 @@
+#withdraw-body {
+    position: relative;
+    width: calc(100vw - 163px);
+}
+
+
+#deposit-body {
+    position: relative;
+    width: calc(100vw - 163px);
+}
+
+
+#inter-bank-transfer-body {
+    position: relative;
+    width: calc(100vw - 163px);
+}
+
+#intra-bank-transfer-body {
+    position: relative;
+    width: calc(100vw - 163px);
+}
+
+.operation-body {
+    position: absolute;
+    display: flex;
+    background-image: linear-gradient(to bottom right,rgb(189, 194, 196) 0%, rgb(123, 137, 159) 60%, rgb(84, 105, 138) 85%);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 700px;
+    width: 700px;
+    left: 55%;
+    top: 40%;
+    Transform: translate(-50%, -50%);
+    border-radius: 30px;
+    box-shadow: 10px 10px 10px rgb(0, 0, 0, 0.9);
+}
+
+.operation-body form{
+    height: 500px;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 40px;
+}
+
+.operation-body form span{
+    margin-left: 25px;
+}
+
+.operation-body form div{
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.operation-body form div input{
+    height: 25px;
+    font-size: 18px;
+}
+
+.operation-body form div select{
+    height: 25px;
+}
+
+.operation-body form button{
+    width: 130px;
+    height: 35px;
+    margin-left: 115px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+}
+
+.operation-body form button:hover{
+    cursor: pointer;
+    background-color: rgb(65, 96, 142);
+}
+
+.info-bar{
+    height: 22px;
+    width: 360px;
+    border-radius: 5px;
+}
+
+.success{
+    background-color: rgb(51, 195, 111);
+}
+
+.failure{
+    background-color: rgb(237, 207, 124);
+}

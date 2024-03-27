@@ -1,0 +1,56 @@
+
+#page_body{
+    width: 100vw;
+}
+
+
+#page-container{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#history-header{
+    margin-top: 40px;
+    width: calc(100% - 50px);
+    display: flex;
+    justify-content: space-between;
+    background-color: #2471a3;
+    color: #ffffff;
+    border-radius: 5px;
+    font-weight: 600;
+    padding: 20px;
+}
+
+#history-body{
+    margin-top: 40px;
+    width: calc(100% - 50px);
+    height: calc(100% - 420px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    
+}
+
+.transaction-table thead{
+    background-color: #5e84ab;
+    border: 2px #ccc solid;
+}
+
+.transaction-table tbody{
+    background-color: #9aaec0;
+}
+
+.transaction-table tbody tr td{
+    text-align: center;
+}
+
+.search:hover{
+    cursor: pointer;
+}
+
+.list-item-selected{
+    background-color: rgb(79, 120, 158);
+}

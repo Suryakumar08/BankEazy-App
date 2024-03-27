@@ -1,0 +1,51 @@
+---
+#The following is the format of this YAML file
+#(TableName):
+# Class: (ClassName or PojoName)
+# (ClassFieldName): (TableColumnName)
+Account:
+ Class: Account
+ accountNo: accountNo
+ customerId: customerId
+ balance: balance
+ branchId: branchId
+ status: status
+Branch:
+ Class: Branch
+ id: id
+ name: name
+ address: address
+ ifsc: ifsc
+Customer:
+ Class: Customer
+ userId: userId
+ pan: pan
+ aadhar: aadhar
+Employee:
+ Class: Employee
+ userId: userId
+ salary: salary
+ joiningDate: joiningDate
+ branchId: branchId
+Transaction:
+ Class: Transaction
+ transactionId: transacionId
+ customerId: customerId
+ accountNo: accountNo
+ transactionAccountNo: transactionAccountNo
+ description: description
+ type: type
+ status: status
+ time: time
+ closingBalance: closingBalance
+ amount: amount
+User:
+ Class: User
+ id: Id
+ name: Name
+ password: Password
+ mobile: Phone
+ gender: Gender
+ dob: Dob
+ type: Type
+ status: Status

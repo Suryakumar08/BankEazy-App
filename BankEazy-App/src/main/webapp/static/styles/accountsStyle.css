@@ -1,0 +1,75 @@
+.account-card{
+    text-decoration: none;
+    color: black;
+}
+
+#accounts-container{
+    height: calc(100vh - 160px);
+    width: calc(100vw - 353px);
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-items: center;
+    overflow-y: auto;
+}
+
+.table-div{
+    margin-top: 0px;
+    margin-left: 0px;
+    
+}
+
+.table{
+    height: 300px;
+    width: 450px;
+    background-image: linear-gradient(to right,rgb(38, 72, 141) 0%, rgb(149, 175, 189) 70%, rgb(217, 213, 213) 95%);
+    border-radius: 20px;
+    transition: height 0.3s,width 0.3s;
+    box-shadow: 15px 15px 25px rgb(0, 0, 0, 0.5);
+    border-left: 2px #ccc solid;
+    border-top: 2px #ccc solid;
+}
+
+.table:hover{
+    height: 320px;
+    width: 470px;
+}
+
+
+.table th img{
+    margin-top: 10px;
+    margin-left: 10px;
+    height: 60px;
+}
+
+.table th{
+    height: 60px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.acc-no{
+    height: 50px;
+    padding: 0;
+    font-size: 35px;
+    text-align: center;
+    vertical-align: top;
+}
+
+.acc-data{
+    font-size: 22px;
+    text-align: center;
+}
+
+.acc-data img{
+    height: 75px;
+    vertical-align: bottom;
+}
+
+.acc-data td{
+    height: 25px;
+}
+
+.acc-data td i:hover{
+	cursor: pointer;
+}
