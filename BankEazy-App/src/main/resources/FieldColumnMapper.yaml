@@ -29,7 +29,7 @@ Employee:
  branchId: branchId
 Transaction:
  Class: Transaction
- transactionId: transacionId
+ transactionId: transactionId
  customerId: customerId
  accountNo: accountNo
  transactionAccountNo: transactionAccountNo
@@ -39,6 +39,7 @@ Transaction:
  time: time
  closingBalance: closingBalance
  amount: amount
+ referenceNo: referenceNo
 User:
  Class: User
  id: Id

@@ -5,18 +5,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Inter-Bank-Transfer</title>
-<link rel="icon"
-	href="<%=request.getContextPath()%>/static/images/favicon.ico"
-	type="image/x-icon">
-<link rel="stylesheet"
-	href="<%=request.getContextPath()%>/static/styles/basicStyles.css">
 <link rel='stylesheet' type='text/css' media='screen'
 	href='<%=request.getContextPath()%>/static/styles/accountOperationsStyle.css'>
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script>
-	
-<%@ include file= "../../../scripts/script.js" %></script>
 </head>
 <body>
 	<div id="inter-bank-transfer-body">
@@ -64,19 +54,23 @@
 						type="text" name="description" id="description" maxlength="50">
 				</div>
 				<div>
-					<label for="password">Password *</label> <input type="password"
+				<label for="password">Password *</label> <input type="password"
 						name="password" id="deposit-password" required>
 				</div>
 
 				<%if(request.getAttribute("failure-info") != null){ %>
                     <span class="info-bar failure"> <span class="info-icon">&#9888;</span><span> <%=request.getAttribute("failure-info") %></span></span>
-                            <%}else if(request.getAttribute("success-info") != null){ %>
+                            <%}else if(request.getAttribute("success-info") != null){ 
+                            %>
+                            <script type="text/javascript">
+                            	var referenceNo = "<%= request.getAttribute("ReferenceNo") %>";
+                            	alert("Your Transaction reference no is : " + referenceNo);
+                            </script>
                     <span class="info-bar success"><span class="info-icon">&check;</span><span> <%=request.getAttribute("success-info") %></span></span>
                             <%} %> <br>
 				<button type="submit">Send</button>
 			</form>
 		</div>
-	</div>
 	</div>
 </body>
 </html>

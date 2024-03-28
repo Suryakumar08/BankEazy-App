@@ -4,25 +4,22 @@
 }
 
 
-#page-container{
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+#page-container {
+	width: 85%;
 }
 
-#history-header{
-    margin-top: 40px;
-    width: calc(100% - 50px);
-    display: flex;
-    justify-content: space-between;
-    background-color: #2471a3;
-    color: #ffffff;
-    border-radius: 5px;
-    font-weight: 600;
-    padding: 20px;
+#history-header {
+	margin-top: 40px;
+	margin-right: 40px;
+	display: flex;
+	justify-content: space-between;
+	background-color: #2471a3;
+	color: #ffffff;
+	border-radius: 5px;
+	font-weight: 600;
+	padding: 20px;
+	margin-left: 40px;
 }
-
 #history-body{
     margin-top: 40px;
     width: calc(100% - 50px);
@@ -39,18 +36,81 @@
     border: 2px #ccc solid;
 }
 
+.transaction-table thead th{
+	padding:5px;	
+}
+
 .transaction-table tbody{
     background-color: #9aaec0;
 }
 
 .transaction-table tbody tr td{
+	padding: 5px;
     text-align: center;
 }
 
-.search:hover{
+.search-div:hover{
     cursor: pointer;
 }
 
 .list-item-selected{
     background-color: rgb(79, 120, 158);
+}
+
+.status-success{
+	color: green;
+}
+
+.status-failure{
+	color: orange;
+}
+
+.pagination-container {
+    width: 100vw;
+    white-space: nowrap;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+.pageNumbers {
+    display: inline-block;
+    overflow-x: auto;
+    width:120px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    
+}
+
+.pageNumbers .pageNumber {
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+}
+
+.pageNumber:hover{
+	background-color: #f2f2f2;
+}
+.pageNumbers .pageNumber.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.prev, .next {
+    cursor: pointer;
+}
+
+.prev:hover, .next:hover {
+    background-color: #f2f2f2;
 }

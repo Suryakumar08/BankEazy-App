@@ -50,6 +50,7 @@ public class DAOHelper {
 				String columnName = metaData.getColumnName(i);
 				Object columnValue = resultSet.getObject(i);
 				String fieldName = columnFieldMap.get(tableName).get("columnToField").get(columnName);
+				System.out.println("field : " + fieldName+"   column name : " + columnName);
 				Validators.checkNull(fieldName, "Mapping Error!");
 				settersMap.get(fieldName).invoke(givenClassInstance, columnValue);
 			}

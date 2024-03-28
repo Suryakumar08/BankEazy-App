@@ -21,11 +21,15 @@
 	href="<%=request.getContextPath()%>/static/styles/basicStyles.css">
 <link rel='stylesheet' type='text/css' media='screen'
 	href='<%=request.getContextPath()%>/static/styles/accountsStyle.css'>
+<link rel='stylesheet' type='text/css' media='screen'
+	href='<%=request.getContextPath()%>/static/styles/transactionHistory.css'>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script>
 	
-<%@ include file= "../../../scripts/script.js" %></script>
+<%@ include file="/scripts/script.js" %>
+<%@ include file="/scripts/historyScript.js" %>
+</script>
 </head>
 
 <body>
@@ -45,41 +49,55 @@
 
 		<%
 		String requestingPageType = (String) request.getAttribute("page_type");
-		System.out.println(requestingPageType);
 		switch (requestingPageType) {
-		case "myAccounts": {
+			case "myAccounts" : {
 		%>
 		<jsp:include page="myAccounts.jsp"></jsp:include>
 
 		<%
 		break;
 		}
-		case "customerWithdraw": {
+		case "customerWithdraw" : {
 		%>
+		<script type="text/javascript">
+			makeSelected("withdraw");
+		</script>
 		<jsp:include page="customerWithdraw.jsp"></jsp:include>
 		<%
 		break;
 		}
-		case "customerDeposit": {
+		case "customerDeposit" : {
 		%>
+		<script type="text/javascript">
+			makeSelected("deposit");
+		</script>
 		<jsp:include page="customerDeposit.jsp"></jsp:include>
 		<%
 		break;
 		}
-		case "customerIntraBankTransfer": {
+		case "customerIntraBankTransfer" : {
 		%>
+		<script type="text/javascript">
+			makeSelected("intra-bank-transfer");
+		</script>
 		<jsp:include page="customerIntraBankTransfer.jsp"></jsp:include>
 		<%
 		break;
 		}
-		case "customerInterBankTransfer": {
+		case "customerInterBankTransfer" : {
 		%>
+		<script type="text/javascript">
+			makeSelected("inter-bank-transfer");
+		</script>
 		<jsp:include page="customerInterBankTransfer.jsp"></jsp:include>
 		<%
 		break;
 		}
-		case "customerTransactionHistory": {
+		case "customerTransactionHistory" : {
 		%>
+		<script type="text/javascript">
+			makeSelected("transactionHistory");
+		</script>
 		<jsp:include page="customerTransactionHistory.jsp"></jsp:include>
 		<%
 		break;

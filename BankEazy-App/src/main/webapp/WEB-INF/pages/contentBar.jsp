@@ -20,7 +20,7 @@
 				<li id="inter-bank-transfer" class="contentList_item"><a
 					href="inter-bank-transfer">Inter Bank Transfer</a></li>
 				<li id="transactionHistory" class="contentList_item"><a
-					href="transactions">Transaction History</a></li>
+					href="transactionHistory">Transaction History</a></li>
 			</ul>
 		</div>
 </body>

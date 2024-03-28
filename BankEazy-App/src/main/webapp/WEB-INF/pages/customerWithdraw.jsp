@@ -5,18 +5,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Withdraw</title>
-<link rel="icon"
-	href="<%=request.getContextPath()%>/static/images/favicon.ico"
-	type="image/x-icon">
-<link rel="stylesheet"
-	href="<%=request.getContextPath()%>/static/styles/basicStyles.css">
 <link rel='stylesheet' type='text/css' media='screen'
 	href='<%=request.getContextPath()%>/static/styles/accountOperationsStyle.css'>
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script>
-	
-<%@ include file= "../../../scripts/script.js" %></script>
 </head>
 <body>
 	<div id="withdraw-body">

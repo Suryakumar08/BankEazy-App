@@ -2,6 +2,7 @@ package helpers;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 
 import daos.TransactionDaoInterface;
@@ -142,13 +143,26 @@ public class TransactionHelper {
 		recipientTransaction.setStatusFromEnum(TransactionStatus.SUCCESS);
 
 		double currBalance = recipientAccount.getBalance();
-		double closingBalance = currBalance + currTransaction.getAmount();
+		double closingBalance = currBalance + Math.abs(currTransaction.getAmount());
 		recipientTransaction.setClosingBalance(closingBalance);
 
 		return recipientTransaction;
 	}
 
 	// read
+	
+	
+	public int getNoOfTransactions(long accountNo, long from, long to) throws CustomBankException{
+		System.out.println("Transaction Helper get noOfTransactions");
+		return transactionDao.getNoOfTransactions(accountNo, from, to);
+	}
+	
+	public List<Transaction> getTransactionsList(long accountNo, long from, long to, int limit, long offset) throws CustomBankException{
+		Transaction transaction = new Transaction();
+		transaction.setAccountNo(accountNo);
+		return transactionDao.getTransactionsList(transaction, from, to, limit, offset);
+	}
+	
 	public Map<Long, Transaction> getAccountTransactions(long accountNo, long from, long to, int limit, long offset)
 			throws CustomBankException {
 		Transaction transaction = new Transaction();

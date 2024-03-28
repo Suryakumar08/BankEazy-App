@@ -5,23 +5,10 @@
 <head>
 <meta charset="UTF-8">
 <title>nav-bar</title>
-<link rel="stylesheet"
-	href="<%=request.getContextPath()%>/static/styles/basicStyles.css">
-<link rel='stylesheet' type='text/css' media='screen'
-	href='<%=request.getContextPath()%>/static/styles/accountsStyle.css'>
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
-
-<script>
-	
-<%@ include file= "../../../scripts/script.js" %>
-	
-</script>
-
 <body>
 	<nav class="navBar">
-		
 		<a class="nav-item" href="<%=request.getContextPath() %>/user/home">My Accounts</a>
 		<a class="nav-item" href="about">About</a>
 		<div class="dropdown">

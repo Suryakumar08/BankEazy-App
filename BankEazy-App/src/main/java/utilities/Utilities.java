@@ -9,8 +9,8 @@ import java.time.format.DateTimeFormatter;
 public class Utilities {
 	
 	
-	public static long getDobInMillis(String dateString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+	public static long getDateInMillis(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(dateString, formatter);
         ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());
         return zonedDateTime.toInstant().toEpochMilli();
