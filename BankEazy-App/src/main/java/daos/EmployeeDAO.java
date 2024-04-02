@@ -19,7 +19,7 @@ public class EmployeeDAO implements EmployeeDaoInterface {
 	private String dbName = "BankEazy";
 
 	private final String selectEmployeeQuery = "select * from User join Employee on User.id = Employee.userId";
-	private final String insertUserQuery = "insert into User(name, password, mobile, gender, dob, status, type) values(?, ?, ?, ?, ?, ?, ?)";
+	private final String insertUserQuery = "insert into User(Name, Password, phone, Gender, Dob, Status, Type) values(?, ?, ?, ?, ?, ?, ?)";
 	private final String insertEmployeeQuery = "insert into Employee values(?, ?, ?, ?)";
 
 	// create
@@ -67,6 +67,7 @@ public class EmployeeDAO implements EmployeeDaoInterface {
 			return newId;
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {

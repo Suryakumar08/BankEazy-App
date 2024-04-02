@@ -9,7 +9,7 @@
 </head>
 <body>
 	<nav class="navBar">
-		<a class="nav-item" href="<%=request.getContextPath() %>/user/home">My Accounts</a>
+		<a class="nav-item ${page_type == 'myAccounts' ? 'selected' : '' }" href="<%=request.getContextPath() %>/user/home">My Accounts</a>
 		<a class="nav-item" href="about">About</a>
 		<div class="dropdown">
 			<button class="dropbtn" onclick="toggleDropDownContent()">
@@ -25,7 +25,6 @@
 				</a> <a href="logout">
 					<p>Logout</p>
 				</a>
-
 			</div>
 		</div>
 	</nav>

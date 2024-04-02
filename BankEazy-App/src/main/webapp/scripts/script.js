@@ -5,7 +5,7 @@ function toggleDropDownContent() {
 	for (var i = 0; i < elementsToToggle.length; i++) {
 		let element = elementsToToggle[i];
 		if (element.style.display === "none" || element.style.display === "") {
-			element.style.display = "block";
+			element.style.display = "flex";
 			arrowDown.style.display = "none";
 			arrowUp.style.display = "block";
 		} else {
@@ -18,25 +18,8 @@ function toggleDropDownContent() {
 
 
 
-function makeSelected(id) {
-
-	var ids = ["withdraw", "deposit", "intra-bank-transfer", "inter-bank-transfer", "transactionHistory"];
-
-
-	var el = document.getElementById(id);
-	if (!el.classList.contains('selected')) {
-		el.classList.add('selected');
-		document.querySelector("title").textContent = id;
-		for (let currId of ids) {
-			var currEl = document.getElementById(currId);
-			if (currId != id) {
-				if (currEl.classList.contains('selected')) {
-					currEl.classList.remove('selected');
-					break;
-				}
-			}
-		}
-	}
+function changeTitle(title) {
+	document.querySelector("title").textContent = title;
 }
 
 

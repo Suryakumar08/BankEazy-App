@@ -28,27 +28,32 @@
 <script>
 	
 <%@ include file="/scripts/script.js" %>
-<%@ include file="/scripts/historyScript.js" %>
+	
 </script>
 </head>
 
 <body>
-
+	<%
+	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");//http 1.1
+	response.setHeader("pragma", "no-cache"); //http 1.0
+	response.setHeader("Expires", "0"); //proxies
+	%>
 	<div class="logo">
 		<img src="<%=request.getContextPath()%>/static/images/logo.png"
 			alt="BankEazy Logo">
 	</div>
 
-	<jsp:include page="navbar.jsp">
-		<jsp:param value="myAccounts" name="page" />
-	</jsp:include>
+		<%
+		String requestingPageType = (String) request.getAttribute("page_type");
+		pageContext.setAttribute("page_type", requestingPageType);
+		%>
+
+	<jsp:include page="navbar.jsp"></jsp:include>
 
 	<div id="page_body">
 		<jsp:include page="contentBar.jsp"></jsp:include>
 
-
 		<%
-		String requestingPageType = (String) request.getAttribute("page_type");
 		switch (requestingPageType) {
 			case "myAccounts" : {
 		%>
@@ -60,7 +65,7 @@
 		case "customerWithdraw" : {
 		%>
 		<script type="text/javascript">
-			makeSelected("withdraw");
+			changeTitle("Withdraw");
 		</script>
 		<jsp:include page="customerWithdraw.jsp"></jsp:include>
 		<%
@@ -69,7 +74,7 @@
 		case "customerDeposit" : {
 		%>
 		<script type="text/javascript">
-			makeSelected("deposit");
+			changeTitle("Deposit");
 		</script>
 		<jsp:include page="customerDeposit.jsp"></jsp:include>
 		<%
@@ -78,7 +83,7 @@
 		case "customerIntraBankTransfer" : {
 		%>
 		<script type="text/javascript">
-			makeSelected("intra-bank-transfer");
+			changeTitle("Intra-bank-transfer");
 		</script>
 		<jsp:include page="customerIntraBankTransfer.jsp"></jsp:include>
 		<%
@@ -87,7 +92,7 @@
 		case "customerInterBankTransfer" : {
 		%>
 		<script type="text/javascript">
-			makeSelected("inter-bank-transfer");
+			changeTitle("Inter-bank-transfer");
 		</script>
 		<jsp:include page="customerInterBankTransfer.jsp"></jsp:include>
 		<%
@@ -96,13 +101,13 @@
 		case "customerTransactionHistory" : {
 		%>
 		<script type="text/javascript">
-			makeSelected("transactionHistory");
+			changeTitle("Transaction History");
 		</script>
 		<jsp:include page="customerTransactionHistory.jsp"></jsp:include>
 		<%
 		break;
 		}
-		default: {
+		default : {
 		%>
 		<jsp:include page="myAccounts.jsp"></jsp:include>
 
@@ -112,5 +117,8 @@
 		%>
 
 	</div>
+	<script>
+	<%@ include file="/scripts/historyScript.js" %>
+	</script>
 </body>
 </html>

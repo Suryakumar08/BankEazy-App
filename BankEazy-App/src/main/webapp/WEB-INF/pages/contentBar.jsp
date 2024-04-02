@@ -11,15 +11,16 @@
 <body>
 	<div id="contentBar">
 			<ul id="contentList">
-				<li id="withdraw" class="contentList_item"><a
+			<% String page_type = (String)pageContext.getAttribute("page_type"); %>
+				<li id="withdraw" class="contentList_item ${ page_type eq 'customerWithdraw' ? 'selected' : ''}" ><a
 					href="withdraw">Withdraw</a></li>
-				<li id="deposit" class="contentList_item"><a
+				<li id="deposit" class="contentList_item ${ page_type eq 'customerDeposit' ? 'selected' : ''}"><a
 					href="deposit">Deposit</a></li>
-				<li id="intra-bank-transfer" class="contentList_item"><a
+				<li id="intra-bank-transfer" class="contentList_item ${ page_type eq 'customerIntraBankTransfer' ? 'selected' : ''}"><a
 					href="intra-bank-transfer">Intra Bank Transfer</a></li>
-				<li id="inter-bank-transfer" class="contentList_item"><a
+				<li id="inter-bank-transfer" class="contentList_item ${ page_type eq 'customerInterBankTransfer' ? 'selected' : ''}"><a
 					href="inter-bank-transfer">Inter Bank Transfer</a></li>
-				<li id="transactionHistory" class="contentList_item"><a
+				<li id="transactionHistory" class="contentList_item ${ page_type eq 'customerTransactionHistory' ? 'selected' : ''}"><a
 					href="transactionHistory">Transaction History</a></li>
 			</ul>
 		</div>

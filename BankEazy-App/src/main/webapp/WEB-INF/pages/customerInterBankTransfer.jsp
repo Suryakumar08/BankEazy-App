@@ -22,7 +22,7 @@
 				<div>
 					<label for="selected-account">Select Account</label> <select
 						name="selected-account" id="accounts-select" required>
-						<option value="null" selected hidden>Select Account</option>
+						<option value="null" selected hidden disabled>Select Account</option>
 						<%
 						for (Long accountNumber : customerAccounts.keySet()) {
 							Account currAccount = ((Account) (customerAccounts.get(accountNumber).get("account")));

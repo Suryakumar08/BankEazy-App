@@ -51,4 +51,32 @@ public class Validators {
 		}
 	}
 	
+	public static void validateNotNull(String value, String fieldName) throws CustomBankException {
+	    if (value == null || value.isEmpty()) {
+	        throw new CustomBankException(fieldName + " cannot be empty!");
+	    }
+	}
+
+
+	public static void validateDob(long dobInMillis) throws CustomBankException {
+	    long eighteenYearsInMillis = 18L * 365 * 24 * 60 * 60 * 1000;
+	    long currentTimeInMillis = System.currentTimeMillis();
+	    long minDobInMillis = currentTimeInMillis - eighteenYearsInMillis;
+	    if (dobInMillis > minDobInMillis) {
+	        throw new CustomBankException("Invalid date of birth! Age should be at least 18 years.");
+	    }
+	}
+
+	public static void validateAadhar(String aadhar) throws CustomBankException {
+	    if (aadhar == null || !aadhar.matches("\\d{12}")) {
+	        throw new CustomBankException("Invalid Aadhar number! Aadhar number should be exactly 12 digits.");
+	    }
+	}
+
+	public static void validatePan(String pan) throws CustomBankException {
+	    if (pan == null || !pan.matches("[A-Z]{5}[0-9]{4}[A-Z]{1}")) {
+	        throw new CustomBankException("Invalid PAN number! PAN number should have the format: ABCDE1234F");
+	    }
+	}
+	
 }

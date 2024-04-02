@@ -9,17 +9,36 @@
 	href="<%=request.getContextPath()%>/static/styles/basicStyles.css">
 <link rel="stylesheet"
 	href="<%=request.getContextPath()%>/static/styles/changePasswordStyle.css">
+	<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script>
+	
+<%@ include file="/scripts/script.js" %>
+	
+</script>
 </head>
 <body>
-
+	<%
+	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");//http 1.1
+	response.setHeader("pragma", "no-cache"); //http 1.0
+	response.setHeader("Expires", "0"); //proxies
+	%>
 	<div class="logo">
 		<img src="<%=request.getContextPath()%>/static/images/logo.png"
 			alt="BankEazy Logo">
 	</div>
-	
-	
+	<%@ page import="enums.UserType" %>
+	<%
+	if ((int) session.getAttribute("userType") == UserType.Customer.getType()) {
+	%>
 	<jsp:include page="navbar.jsp"></jsp:include>
-	
+	<%
+	} else {
+	%>
+	<jsp:include page="employeeNav.jsp"></jsp:include>
+	<%
+	}
+	%>
 	<div id="page_body">
         <div class="container">
             <div class="change-password-image">

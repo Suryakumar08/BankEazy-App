@@ -107,7 +107,6 @@ public class TransactionDAO implements TransactionDaoInterface {
 				statement.setObject(1, accountNo);
 				statement.setObject(2, from);
 				statement.setObject(3, to);
-				System.out.println(statement);
 				ResultSet result = statement.executeQuery();
 				if(result.next()) {
 					return result.getInt(1);

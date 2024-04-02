@@ -36,7 +36,7 @@ public class BranchHelper {
 	//read
 	public Map<Integer, Branch> getAllBranches() throws CustomBankException {
 		Branch dummyBranch = new Branch();
-		return branchDao.getBranches(dummyBranch, 50, 0);
+		return branchDao.getBranches(dummyBranch, 100, 0);
 	}
 
 	public Branch getBranch(int branchId) throws CustomBankException {

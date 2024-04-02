@@ -22,18 +22,23 @@ public class StaticFilter implements javax.servlet.Filter {
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest) request;
-		System.out.println("From staticfilter" + req.getRequestURI());
+		System.out.println("From staticfilter!  FULL PATH : " + req.getRequestURI());
 		String path = req.getRequestURI().substring(req.getContextPath().length());
+		System.out.println("path after deleting contxtPath : " + path);
 		if (path.equals("/")) {
 			request.getRequestDispatcher("/static/index.jsp").forward(request, response);
 		}
 		else if(path.equals("/login")) {
 			request.getRequestDispatcher("/static/login.jsp").forward(request, response);
 		}
+		else if(path.startsWith("/home")) {
+			request.getRequestDispatcher("/pages" + path).forward(request, response);
+		}
 		else if(path.startsWith("/static")) {
+			chain.doFilter(request, response);
+		}
+		else {
 		    chain.doFilter(request, response);
-		} else {
-		    request.getRequestDispatcher("/pages" + path).forward(request, response);
 		}
 	}
 	

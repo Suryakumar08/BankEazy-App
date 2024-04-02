@@ -77,6 +77,17 @@ public class TransactionHelper {
 		double currAmount = currTransaction.getAmount();
 		long currAccountNo = currTransaction.getAccountNo();
 		long transactionAccountNo = currTransaction.getTransactionAccountNo();
+		
+		if(!isInterBank && currTransaction.getType() != TransactionType.DEPOSIT.getType() && currTransaction.getType() != TransactionType.WITHDRAW.getType()) {
+			try {
+			Account receiverAccount = accHelper.getAccount(transactionAccountNo);
+			if(receiverAccount == null) {
+				throw new CustomBankException("Receiver Account not found!");
+			}
+			}catch(CustomBankException ex) {
+				throw new CustomBankException("No Receiver Account Found!");
+			}
+		}
 
 		isValidTransaction(currAccountNo, transactionAccountNo);
 
@@ -100,7 +111,7 @@ public class TransactionHelper {
 			if (closingBalance < 0) {
 				throw new CustomBankException(CustomBankException.NOT_ENOUGH_BALANCE);
 			}
-			currTransaction.setAmount(0 - currAmount);
+			currTransaction.setAmount(currAmount);
 			currTransaction.setClosingBalance(closingBalance);
 
 			if (currTransaction.getType() == TransactionType.DEBIT.getType() && isInterBank == false) {
@@ -135,7 +146,6 @@ public class TransactionHelper {
 		recipientTransaction.setAccountNo(currTransaction.getTransactionAccountNo());
 		recipientTransaction.setCustomerId(recipientAccount.getCustomerId());
 		recipientTransaction.setTransactionAccountNo(currTransaction.getAccountNo());
-		recipientTransaction.setDescription(currTransaction.getDescription());
 		recipientTransaction.setTransactionId(currTransaction.getTransactionId());
 		recipientTransaction.setAmount(currTransaction.getAmount());
 		recipientTransaction.setTypeFromEnum(TransactionType.CREDIT);
@@ -153,7 +163,6 @@ public class TransactionHelper {
 	
 	
 	public int getNoOfTransactions(long accountNo, long from, long to) throws CustomBankException{
-		System.out.println("Transaction Helper get noOfTransactions");
 		return transactionDao.getNoOfTransactions(accountNo, from, to);
 	}
 	

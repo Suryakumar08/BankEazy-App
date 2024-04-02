@@ -33,6 +33,12 @@ public class CustomerHelper {
 	//create
 	public int addCustomer(Customer customer) throws CustomBankException {
 		Validators.checkNull(customer);
+		String aadhar = customer.getAadhar();
+		String pan = customer.getPan();
+		if(getCustomerFromAadhar(aadhar) != null || getCustomerFromPan(pan) != null) {
+			System.out.println("Customer already exists!");
+			throw new CustomBankException("Customer already exists!!!");
+		}
 		String password = customer.getPassword();
 		customer.setPassword(Sha_256.getHashedPassword(password));
 		customer.setStatus(1);
@@ -46,6 +52,42 @@ public class CustomerHelper {
 		dummyCustomer.setId(customerId);
 		Map<Integer, Customer> customerMap =  customerDao.getCustomers(dummyCustomer, 1, 0);
 		return customerMap.get(customerId);
+	}
+	
+	public Customer getCustomerFromAadhar(String aadhar) throws CustomBankException{
+		Validators.checkNull(aadhar, "Aadhar number should not be empty or null!");
+		Customer dummyCustomer = new Customer();
+		dummyCustomer.setAadhar(aadhar);
+		Map<Integer, Customer> customerMap = customerDao.getCustomers(dummyCustomer, 1, 0);
+		Customer returnCustomer = null;
+		if(customerMap == null) {
+			return returnCustomer;
+		}
+		else {
+			for(Customer customer : customerMap.values()) {
+				returnCustomer = customer;
+				break;
+			}
+		}
+		return returnCustomer;
+	}
+	
+	public Customer getCustomerFromPan(String pan) throws CustomBankException{
+		Validators.checkNull(pan, "pan number should not be empty or null!");
+		Customer dummyCustomer = new Customer();
+		dummyCustomer.setPan(pan);
+		Map<Integer, Customer> customerMap = customerDao.getCustomers(dummyCustomer, 1, 0);
+		Customer returnCustomer = null;
+		if(customerMap == null) {
+			return returnCustomer;
+		}
+		else {
+			for(Customer customer : customerMap.values()) {
+				returnCustomer = customer;
+				break;
+			}
+		}
+		return returnCustomer;
 	}
 	
 	public Map<Integer, Customer> getCustomers(Customer customer, int limit, long offset) throws CustomBankException{

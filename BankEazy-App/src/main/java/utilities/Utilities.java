@@ -27,6 +27,13 @@ public class Utilities {
 		return resultDate;
 	}
 	
+	public static String getDOBString(long millis) {
+		Instant instant = Instant.ofEpochMilli(millis);
+		ZonedDateTime date = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
+		String resultDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		return resultDate;
+	}
+	
 	public static String getDateTimeString(long millis) {
 		Instant instant = Instant.ofEpochMilli(millis);
 		ZonedDateTime dateTime = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());

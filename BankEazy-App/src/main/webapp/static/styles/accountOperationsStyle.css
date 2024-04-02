@@ -32,8 +32,8 @@
     left: 55%;
     top: 40%;
     Transform: translate(-50%, -50%);
-    border-radius: 30px;
-    box-shadow: 10px 10px 10px rgb(0, 0, 0, 0.9);
+    border-radius: 5px;
+    box-shadow: 10px 10px 30px rgb(0, 0, 0, 0.9);
 }
 
 .operation-body form{
@@ -46,7 +46,7 @@
 }
 
 .operation-body form span{
-    margin-left: 25px;
+    margin-left: 0px;
 }
 
 .operation-body form div{
@@ -80,7 +80,7 @@
 
 .info-bar{
     height: 22px;
-    width: 360px;
+    width: 400px;
     border-radius: 5px;
 }
 
