@@ -196,6 +196,11 @@ body {
 	color: rgb(6, 6, 162) !important;
 }
 
+.selectedA{
+	background-color: white;
+	color: rgb(6, 6, 162) !important;
+}
+
 .selected a{
 	background-color: rgb(95, 129, 160);
 	color: white !important;

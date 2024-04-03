@@ -1,22 +1,20 @@
-<%@page import="enums.UserType"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>View User</title>
+<title>Search account</title>
 </head>
 <body>
-	
-	<div class="view-user-body">
+	<div class="view-account-body">
 		<%
-		if (request.getAttribute("searched-user") == null) {
+		if (request.getAttribute("searched-account") == null) {
 		%>
 		<div>
-			<form class="view-user-form" method="get" action="getUser">
+			<form class="view-account-form" method="get" action="viewAccount">
 				<div class="search-bar-div">
-					<input class="search-input" type="number" name="viewUserId" placeholder="Enter User Id">
+					<input class="search-input" type="number" name="viewAccountNo" placeholder="Enter Account no">
 				</div>
 				<div>
 					<button type="submit" class="button">Search</button>
@@ -39,12 +37,11 @@
 		<%
 		}
 		}
-		 else if (request.getAttribute("searched-user") != null) {
+		 else if (request.getAttribute("searched-account") != null) {
 		%>
-		<jsp:include page="viewForm.jsp"></jsp:include>
+		<jsp:include page="viewAccountForm.jsp"></jsp:include>
 		<%
 		}
 		%>
-	</div>
 </body>
 </html>

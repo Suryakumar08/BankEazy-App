@@ -1,3 +1,4 @@
+<%@page import="enums.UserType"%>
 <%@page import="enums.TransactionStatus"%>
 <%@page import="enums.TransactionType"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -15,6 +16,16 @@
 		<form id="form" action="transactionHistory" method="post">
 		<div id="history-header">
 			<div class="accounts">
+			
+			<%if((int)session.getAttribute("userType") != UserType.Customer.getType()){ %>
+			<div>
+				<label for=selectedAccount>Enter Account No</label>
+				<input name="selectedAccount" placeholder="Enter Account No" type="number" required value="${param.selectedAccount }">
+			</div>
+			<%}else{ %>
+			
+			
+			
 				<%@ page import="java.util.Map"%>
 				<%@ page import="model.Account"%>
 				<%@ page import="enums.AccountStatus"%>
@@ -24,7 +35,7 @@
 				boolean isHiddenSelected = false;
 				%>
 				<div>
-					<label for="selected-account">Select Account</label> <select
+					<label for="selectedAccount">Select Account</label> <select
 						name="selectedAccount" id="accounts-select" required>
 						<%
 						if (request.getAttribute("selected-account") == null) {
@@ -52,6 +63,7 @@
 						%>
 					</select>
 				</div>
+				<%} %>
 			</div>
 			<div class="date-from">
 			<label for="from_date">From</label>

@@ -1,3 +1,4 @@
+<%@page import="enums.UserType"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -11,12 +12,14 @@
 <body>
 	<div id="deposit-body">
 		<div class="operation-body">
-			<form action="deposit" method="post" autocomplete="off">
+			<form action="deposit" method="post" autocomplete="off" class="dataForm">
 				<%@ page import="java.util.Map"%>
 				<%@ page import="model.Account"%>
 				<%@ page import="enums.AccountStatus"%>
 				<%@ page import="org.json.JSONObject"%>
+				
 				<%
+				if((int)session.getAttribute("userType") == UserType.Customer.getType()){
 				Map<Long, JSONObject> customerAccounts = (Map<Long, JSONObject>) request.getAttribute("customerAccounts");
 				%>
 				<div>
@@ -35,13 +38,19 @@
 						%>
 					</select>
 				</div>
+				<%}else{ %>
+					<div>
+						<label for="selected-account" class="label">Select Account</label>
+						<input name="selected-account" placeholder="Account No" value="${param.selected-account }">
+					</div>
+				<%} %>
 				<div>
 					<label for="amount">Amount *</label> <input type="number" min="100"
-						max="200000" step="0.1" name="amount" id="deposit-input" required>
+						max="200000" step="0.01" name="amount" id="deposit-input" required placeholder="Enter amount">
 				</div>
 				<div>
 					<label for="password">Password *</label> <input type="password"
-						name="password" id="deposit-password" required>
+						name="password" id="deposit-password" required placeholder="Enter password">
 				</div>
 
 				<%
@@ -57,7 +66,6 @@
 				<%
 				}
 				%>
-				<br>
 				<button type="submit">Deposit</button>
 			</form>
 		</div>

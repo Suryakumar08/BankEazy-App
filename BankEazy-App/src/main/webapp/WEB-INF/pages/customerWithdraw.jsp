@@ -43,11 +43,11 @@
 				</div>
 				<div>
 					<label for="amount">Amount *</label> <input type="number" min="100"
-						max="20000" step="100" name="amount" id="withdraw-input" required>
+						max="20000" step="100" name="amount" id="withdraw-input" required placeholder="Enter amount">
 				</div>
 				<div>
 					<label for="password">Password *</label> <input type="password"
-						name="password" id="withdraw-password" required>
+						name="password" id="withdraw-password" required placeholder="Enter password">
 				</div>
 
 				<%
@@ -63,7 +63,6 @@
 				<%
 				}
 				%>
-				<br>
 				<button type="submit">Withdraw</button>
 			</form>
 		</div>

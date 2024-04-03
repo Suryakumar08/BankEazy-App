@@ -8,7 +8,7 @@
 </head>
 <body>
 <%@ page import="enums.UserType" %>
-	<form id="form" method="post">
+	<form id="dataForm" method="post">
 			<%
 			if ((int) session.getAttribute("userType") == UserType.Admin.getType()) {
 				System.out.println("Success-message : " + request.getAttribute("success-message"));

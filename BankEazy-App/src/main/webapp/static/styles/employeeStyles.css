@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-.employee-page-body{
+.employee-page-body {
 	width: 100%;
 	display: flex;
 	flex-direction: column;
@@ -8,80 +8,337 @@
 	align-items: center;
 }
 
-#form{
-	height:fit-content;
-	min-height:75%;
-	width:45%;
+#dataForm {
+	height: fit-content;
+	min-height: 75%;
+	width: 45%;
 	display: flex;
 	flex-direction: column;
-	align-items:center;
-	justify-content:center;
-	gap:1.5rem;
+	align-items: center;
+	justify-content: center;
+	gap: 1.5rem;
 	padding: 10px;
-	background-color:  #ebedef;
+	background-color: #ebedef;
 	border-radius: 10px;
 	box-shadow: 10px 10px 30px rgb(0, 0, 0, 0.6);
 }
 
-#form div{
-	width:70%;
+#dataForm div {
+	width: 70%;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 }
 
-.customer-tags, .employee-tags{
-	width:70%;
+.customer-tags, .employee-tags {
+	width: 70%;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 }
 
-.label{
-	font-size:18px;
+.label {
+	font-size: 18px;
 }
 
-.input{
-	font-size:18px;
-	margin-top:6px;
-	padding:2px;
+.input {
+	font-size: 18px;
+	margin-top: 6px;
+	padding: 2px;
 }
 
-.select{
-	font-size:18px;
-	margin-top:6px;
-	padding:2px;
+.select {
+	font-size: 18px;
+	margin-top: 6px;
+	padding: 2px;
 }
 
-#form .submit-button-div{
+#dataForm .submit-button-div {
 	width: 15%;
 	height: 40px;
 	display: flex;
-	gap:20px;
+	gap: 20px;
 }
 
-.submit-button-div button{
-	height:33px;
-	font-size:18px;
+.submit-button-div button {
+	height: 33px;
+	font-size: 18px;
 }
 
-.info-bar{
-	height:20px !important;
+.info-bar {
+	height: 20px !important;
 	font-size: 12px;
 	justify-content: center;
 	align-items: center;
 }
 
-.success{
-	color : green;
+.success {
+	color: green;
 	font-size: 15px;
 }
 
-.failure{
-	font-size:15px;
+.failure {
+	font-size: 15px;
 	color: red;
 }
 
-.submit-button-div button:hover{
+.submit-button-div button:hover {
 	cursor: pointer;
 }
+
+.view-user-body {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 30px;
+}
+
+.view-user-form {
+	display: flex;
+	flex-direction: row;
+	gap: 20px;
+}
+
+.view-account-body {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 30px;
+}
+
+.view-account-form {
+	display: flex;
+	flex-direction: row;
+	gap: 20px;
+}
+
+.search-bar-div {
+	width: 600px;
+}
+
+.search-bar-div input {
+	width: 450px;
+	height: 45px;
+	font-size: 25px;
+	-moz-appearance: textfield;
+	border-radius: 10px;
+	border-bottom: 3px solid gray;
+	border-right: 3px solid gray;
+}
+
+.view-user-form div button {
+	width: 140px;
+	height: 45px;
+	font-size: 25px;
+	border-radius: 10px;
+}
+
+.view-account-form div button {
+	width: 140px;
+	height: 45px;
+	font-size: 25px;
+	border-radius: 10px;
+}
+
+.view-user-form div button:hover {
+	cursor: pointer;
+}
+
+.view-account-form div button:hover{
+	cursor: pointer;
+}
+
+.message-div {
+	width: 550px;
+	text-align: left;
+}
+
+.message-div span {
+	font-size: 15px;
+}
+
+.update-user-form {
+	display: flex;
+	flex-direction: column;
+	width: 450px;
+	gap: 20px;
+	justify-content: center;
+	background-color: #d7dbdd;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	padding-left: 130px;
+	padding-right: 130px;
+	border-radius: 10px;
+}
+
+.update-user-form div {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.update-user-form div input {
+	height: 25px;
+	width: 100%;
+	font-size: 16px;
+	border-radius: 10px;
+}
+
+.update-user-form div select {
+	height: 35px;
+	width: 101%;
+	border-radius: 10px;
+}
+
+.update-user-form input[type="submit"] {
+	width: 80px;
+	font-size: 22px;
+	margin-left: 42%;
+}
+
+.update-user-form input[type="submit"]:hover {
+	cursor: pointer;
+	background-color: #616A6B;
+	color:white;
+}
+
+.update-user-form input[type="button"]{
+	width:80px;
+	font-size:22px;
+	margin-left:42%;
+	background-color: red;
+	color: white;
+}
+
+.add-account-page-body {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.add-account-form {
+	width: 450px;
+	display: flex;
+	gap: 30px;
+	flex-direction: column;
+	justify-content: center;
+	background-color: #d7dbdd;
+	padding: 60px;
+	border-radius: 20px;
+}
+
+.add-account-form div {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.add-account-form div input {
+	border-radius: 6px;
+	-moz-appearance: textfield;
+}
+
+.message-div{
+	width:80%;
+	text-align: center;
+}
+
+.submit-input {
+	width: fit-content;
+	padding: 6px;
+	font-size: 18px;
+}
+
+.success {
+	color: green;
+	text-align: center;
+	font-size: 12px;
+}
+
+.failure {
+	color: red; text-align : center;
+	font-size: 12px;
+}
+
+.submit-div {
+	align-items: center;
+}
+
+.submit-div input:hover {
+	cursor: pointer;
+	background-color: #616A6B;
+	color:white;
+}
+
+.button-div{
+	display: flex;
+	align-items: center;
+}
+
+.deactivate-button{
+	width:fit-content;
+	color:white;
+	background-color: red;
+	font-size:18px;
+	border-radius: 6px;
+}
+
+.activate-button{
+	width:fit-content;
+	color:white;
+	background-color: green;
+	font-size:18px;
+	border-radius: 6px;
+}
+
+.deactivate-button:hover{
+	cursor: pointer;
+}
+
+.activate-button:hover{
+	cursor:pointer;
+}
+
+
+
+.update-account-form {
+	display: flex;
+	flex-direction: column;
+	width: 450px;
+	gap: 20px;
+	justify-content: center;
+	background-color: #d7dbdd;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	padding-left: 130px;
+	padding-right: 130px;
+	border-radius: 10px;
+}
+
+.update-account-form div {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.update-account-form div input {
+	height: 25px;
+	width: 100%;
+	font-size: 16px;
+	border-radius: 10px;
+	-moz-appearance: textField;
+}
+
+.update-account-form div select {
+	height: 35px;
+	width: 101%;
+	border-radius: 10px;
+}
+
+

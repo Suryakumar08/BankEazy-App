@@ -8,6 +8,7 @@ import java.util.Map;
 import org.json.JSONObject;
 
 import daos.AccountDaoInterface;
+import enums.AccountStatus;
 import exception.CustomBankException;
 import model.Account;
 import model.Branch;
@@ -47,7 +48,7 @@ public class AccountHelper {
 	
 	public Map<Long, Account> getAccounts(Account account) throws CustomBankException {
 		Validators.checkNull(account);
-		Map<Long, Account> accountMap = accountDao.getAccounts(account,10,0);
+		Map<Long, Account> accountMap = accountDao.getAccounts(account,20,0);
 		return accountMap;
 	}
 	
@@ -56,7 +57,12 @@ public class AccountHelper {
 		Account dummyAccount = new Account();
 		dummyAccount.setAccountNo(accountNo);
 		Map<Long, Account> accountMap = accountDao.getAccounts(dummyAccount, 1, 0);
-		Validators.checkNull(accountMap);
+		try{
+			Validators.checkNull(accountMap);
+		}
+		catch(CustomBankException ex) {
+			throw new CustomBankException("Account not found!");
+		}
 		return accountMap.get(accountNo);
 	}
 
@@ -122,6 +128,53 @@ public class AccountHelper {
 	
 	public boolean updateAccount(Account account) throws CustomBankException{
 		Validators.checkNull(account);
+		Validators.checkNull(account.getAccountNo());
+		return accountDao.updateAccount(account);
+	}
+	
+	
+	public boolean inActivateAccount(long accountNo) throws CustomBankException{
+		Account account = getAccount(accountNo);
+		if(account == null) {
+			throw new CustomBankException("Account not found!");
+		}
+		int customerId = account.getCustomerId();
+		Account dummy = new Account();
+		dummy.setCustomerId(customerId);
+		Map<Long, Account> customerAccounts = getAccounts(dummy);
+		boolean hasAnotherActiveAccount = false;
+		for(Account currAccount : customerAccounts.values()) {
+			if(currAccount.getAccountNo() != accountNo) {
+				if(currAccount.getStatus() == AccountStatus.ACTIVE.getStatus()) {
+					hasAnotherActiveAccount = true;
+					break;
+				}
+			}
+		}
+		boolean isUpdated = false;
+		if(account.getStatus() == AccountStatus.ACTIVE.getStatus()) {
+			account.setStatus(AccountStatus.INACTIVE.getStatus());
+			isUpdated = accountDao.updateAccount(account);	
+			if(!hasAnotherActiveAccount) {
+				CustomerHelper customerHelper = new CustomerHelper();
+				customerHelper.inActivateCustomer(customerId);
+			}
+		}
+		return isUpdated;
+	}
+	
+	
+	public boolean activateAccount(long accountNo) throws CustomBankException{
+		Account account = getAccount(accountNo);
+		if(account == null) {
+			throw new CustomBankException("Account not found!");
+		}
+		if(account.getStatus() == AccountStatus.ACTIVE.getStatus()) {
+			return true;
+		}
+		int customerId = account.getCustomerId();
+		new CustomerHelper().activateIfInactive(customerId);
+		account.setStatus(AccountStatus.ACTIVE.getStatus());
 		return accountDao.updateAccount(account);
 	}
 
@@ -129,7 +182,7 @@ public class AccountHelper {
 	
 	//checking
 	public boolean isActiveBankAccount(Account account) throws CustomBankException{
-		if(account.getStatus() == 0) {
+		if(account.getStatus() == AccountStatus.INACTIVE.getStatus()) {
 			throw new CustomBankException(CustomBankException.ACCOUNT_INACTIVE);
 		}
 		return true;

@@ -34,7 +34,7 @@ public class Validators {
 
 	public static void checkNull(Object object, String message) throws CustomBankException{
 		if(object == null) {
-			throw new CustomBankException(CustomBankException.NULL_MESSAGE + " " + message);
+			throw new CustomBankException(message);
 		}
 	}
 

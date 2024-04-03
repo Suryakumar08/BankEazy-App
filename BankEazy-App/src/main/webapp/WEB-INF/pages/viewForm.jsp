@@ -17,7 +17,7 @@
 	User user = (User) request.getAttribute("searched-user");
 	String userType = user.getTypeAsString();
 	%>
-	<form action="updateUserDetails" method="post">
+	<form action="updateUserDetails" method="post" class="update-user-form">
 	<div>
 	<label for="id" class="label">Id:</label>
         <input type="text" name="userId" value="<%= user.getId() %>" readOnly required>
@@ -134,6 +134,12 @@
         
         <!-- Submit Button -->
         <input type="submit" value="edit">
+        <input type="button" value="cancel" id="cancel-button">
     </form>
+    <script>
+    	document.getElementById("cancel-button").addEventListener('click', function(){
+    		location.reload();
+    	});
+    </script>
 </body>
 </html>

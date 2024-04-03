@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
 
+import enums.AccountStatus;
 import enums.TransactionType;
 import enums.UserStatus;
 import enums.UserType;
@@ -23,6 +24,7 @@ import helpers.CustomerHelper;
 import helpers.EmployeeHelper;
 import helpers.TransactionHelper;
 import helpers.UserHelper;
+import model.Account;
 import model.Branch;
 import model.Customer;
 import model.Employee;
@@ -79,10 +81,6 @@ public class MainController extends HttpServlet {
 		}
 		case "/pages/user/home": {
 			try {
-				HttpSession session = request.getSession(false);
-				if (session == null) {
-					throw new CustomBankException("Please Login to continue!");
-				}
 				setCustomerAccounts(request, response);
 				request.setAttribute("page_type", "myAccounts");
 				request.getRequestDispatcher("/WEB-INF/pages/userHome.jsp").forward(request, response);
@@ -95,7 +93,6 @@ public class MainController extends HttpServlet {
 		case "/pages/admin/home":
 		case "/pages/employee/home": {
 			try {
-				HttpSession session = request.getSession(false);
 				request.setAttribute("page_type", "manage-user");
 				request.setAttribute("page_name", "addUser");
 				BranchHelper branchHelper = new BranchHelper();
@@ -181,27 +178,22 @@ public class MainController extends HttpServlet {
 			break;
 		}
 		case "/pages/user/withdraw": {
-			HttpSession session = request.getSession(false);
 			try {
+				request.setAttribute("page_type", "customerWithdraw");
 				setCustomerAccounts(request, response);
 				if (request.getAttribute("failure-info") != null) {
 					request.setAttribute("failure-info", (String) request.getAttribute("failure-info"));
-					request.setAttribute("page_type", "customerWithdraw");
 					request.getRequestDispatcher("/WEB-INF/pages/userHome.jsp").forward(request, response);
 				} else if (request.getAttribute("success-info") != null) {
 					request.setAttribute("success-info", (String) request.getAttribute("success-info"));
-					request.setAttribute("page_type", "customerWithdraw");
 					request.getRequestDispatcher("/WEB-INF/pages/userHome.jsp").forward(request, response);
 				} else if (request.getParameter("amount") == null) {
-					request.setAttribute("page_type", "customerWithdraw");
 					request.getRequestDispatcher("/WEB-INF/pages/userHome.jsp").forward(request, response);
 				} else {
-					request.setAttribute("page_type", "customerWithdraw");
 					request.getRequestDispatcher("/pages/user/doWithdraw").forward(request, response);
 				}
 			} catch (CustomBankException ex) {
 				request.setAttribute("failure-info", ex.getMessage());
-				request.setAttribute("page_type", "customerWithdraw");
 				request.getRequestDispatcher(request.getContextPath() + "/WEB-INF/pages/userHome.jsp");
 			}
 			break;
@@ -235,32 +227,27 @@ public class MainController extends HttpServlet {
 			break;
 		}
 		case "/pages/user/deposit": {
-			HttpSession session = request.getSession(false);
 			try {
+				request.setAttribute("page_type", "customerDeposit");
 				setCustomerAccounts(request, response);
 				if (request.getAttribute("failure-info") != null) {
 					request.setAttribute("failure-info", (String) request.getAttribute("failure-info"));
-					request.setAttribute("page_type", "customerDeposit");
 					request.getRequestDispatcher("/WEB-INF/pages/userHome.jsp").forward(request, response);
 				} else if (request.getAttribute("success-info") != null) {
 					request.setAttribute("success-info", (String) request.getAttribute("success-info"));
-					request.setAttribute("page_type", "customerDeposit");
 					request.getRequestDispatcher("/WEB-INF/pages/userHome.jsp").forward(request, response);
 				} else if (request.getParameter("amount") == null) {
-					request.setAttribute("page_type", "customerDeposit");
 					request.getRequestDispatcher("/WEB-INF/pages/userHome.jsp").forward(request, response);
 				} else {
-					request.setAttribute("page_type", "customerDeposit");
 					request.getRequestDispatcher("/pages/user/doDeposit").forward(request, response);
 				}
 			} catch (CustomBankException ex) {
 				request.setAttribute("failure-info", ex.getMessage());
-				request.setAttribute("page_type", "customerDeposit");
 				request.getRequestDispatcher(request.getContextPath() + "/WEB-INF/pages/userHome.jsp");
 			}
 			break;
 		}
-		case "/pages/user/doDeposit": {
+		case "/pages/user/doDeposit":{
 			HttpSession session = request.getSession(false);
 			String selectedAccountString = request.getParameter("selected-account");
 			String amountString = request.getParameter("amount");
@@ -279,8 +266,8 @@ public class MainController extends HttpServlet {
 				TransactionHelper transactionHelper = new TransactionHelper();
 				transactionHelper.depositAmount(selectedAccount, amount);
 				request.setAttribute("success-info", "Deposit successful!");
-				request.setAttribute("page_type", "customerDeposit");
-				request.getRequestDispatcher("/pages/user/deposit").forward(request, response);
+					request.setAttribute("page_type", "customerDeposit");
+					request.getRequestDispatcher("/pages/user/deposit").forward(request, response);
 			} catch (CustomBankException ex) {
 				System.out.println("in catch block of /pages/user/doDeposit...");
 				request.setAttribute("failure-info", ex.getMessage());
@@ -289,7 +276,6 @@ public class MainController extends HttpServlet {
 			break;
 		}
 		case "/pages/user/inter-bank-transfer": {
-			HttpSession session = request.getSession(false);
 			try {
 				setCustomerAccounts(request, response);
 				if (request.getAttribute("failure-info") != null) {
@@ -366,7 +352,6 @@ public class MainController extends HttpServlet {
 		}
 
 		case "/pages/user/intra-bank-transfer": {
-			HttpSession session = request.getSession(false);
 
 			try {
 				setCustomerAccounts(request, response);
@@ -439,17 +424,20 @@ public class MainController extends HttpServlet {
 			}
 			break;
 		}
-		case "/pages/user/transactionHistory": {
+		case "/pages/user/transactionHistory":
+		case "/pages/employee/transactionHistory":
+		case "/pages/admin/transactionHistory": {
 			try {
-				HttpSession session = request.getSession(false);
-				setCustomerAccounts(request, response);
+				if (path.startsWith("/pages/user")) {
+					setCustomerAccounts(request, response);
+				}
 				String selectedAccountString = request.getParameter("selectedAccount");
 				String fromDateString = request.getParameter("fromDate");
 				String toDateString = request.getParameter("toDate");
 				if (selectedAccountString == null && fromDateString == null && toDateString == null) {
 					throw new CustomBankException("");
 				}
-				if (selectedAccountString == null) {
+				if (selectedAccountString == null || selectedAccountString.equals("")) {
 					throw new CustomBankException("Please select Account!");
 				}
 				long selectedAccount = Long.parseLong(selectedAccountString);
@@ -488,12 +476,25 @@ public class MainController extends HttpServlet {
 				request.setAttribute("transactions", transactionsList);
 				request.setAttribute("page_type", "customerTransactionHistory");
 				request.removeAttribute("failure-info");
-				request.getRequestDispatcher("/WEB-INF/pages/userHome.jsp").forward(request, response);
+				if (path.startsWith("/pages/user")) {
+					request.getRequestDispatcher("/WEB-INF/pages/userHome.jsp").forward(request, response);
+				} else {
+					request.setAttribute("page_type", "manage-transactions");
+					request.setAttribute("page_name", "transactionHistory");
+					request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
+				}
 			} catch (CustomBankException ex) {
 				ex.printStackTrace();
 				request.setAttribute("failure-info", ex.getMessage());
-				request.setAttribute("page_type", "customerTransactionHistory");
-				request.getRequestDispatcher("/WEB-INF/pages/userHome.jsp").forward(request, response);
+				if (path.startsWith("/pages/user")) {
+					request.setAttribute("page_type", "customerTransactionHistory");
+					request.getRequestDispatcher("/WEB-INF/pages/userHome.jsp").forward(request, response);
+				} else {
+					System.out.println("else in exception");
+					request.setAttribute("page_type", "manage-transactions");
+					request.setAttribute("page_name", "transactionHistory");
+					request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
+				}
 			}
 			break;
 		}
@@ -582,7 +583,7 @@ public class MainController extends HttpServlet {
 		case "/pages/admin/getUser": {
 			try {
 				String viewUserId = request.getParameter("viewUserId");
-				if (viewUserId == null) {
+				if (viewUserId == null || viewUserId.equals("")) {
 					throw new CustomBankException("");
 				}
 				int currUserId = Integer.parseInt(viewUserId);
@@ -618,7 +619,7 @@ public class MainController extends HttpServlet {
 		case "/pages/employee/getUser": {
 			try {
 				String viewUserId = request.getParameter("viewUserId");
-				if (viewUserId == null) {
+				if (viewUserId == null || viewUserId.equals("")) {
 					throw new CustomBankException("");
 				}
 				int currUserId = Integer.parseInt(viewUserId);
@@ -675,7 +676,6 @@ public class MainController extends HttpServlet {
 					currCustomer.setType(UserType.valueOf(currType).getType());
 					currCustomer.setAadhar(currAadhar);
 					currCustomer.setPan(currPan);
-					System.out.println("editing customer : " + currCustomer);
 					CustomerHelper helper = new CustomerHelper();
 					helper.updateCustomer(currCustomer, currUserId);
 				} else {
@@ -697,7 +697,6 @@ public class MainController extends HttpServlet {
 					currEmployee.setSalary(currSalary);
 					currEmployee.setJoiningDate(joiningDate);
 					currEmployee.setBranchId(currBranchId);
-					System.out.println("editing customer : " + currEmployee);
 					EmployeeHelper helper = new EmployeeHelper();
 					helper.updateEmployee(currEmployee, currUserId);
 				}
@@ -737,7 +736,6 @@ public class MainController extends HttpServlet {
 				currCustomer.setType(UserType.valueOf(currType).getType());
 				currCustomer.setAadhar(currAadhar);
 				currCustomer.setPan(currPan);
-				System.out.println("editing customer : " + currCustomer);
 				CustomerHelper helper = new CustomerHelper();
 				helper.updateCustomer(currCustomer, currUserId);
 				request.setAttribute("success-message", "User updation successful!");
@@ -750,6 +748,156 @@ public class MainController extends HttpServlet {
 				request.setAttribute("page_type", "manage-user");
 				request.setAttribute("page_name", "viewUser");
 				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
+			}
+			break;
+		}
+
+		case "/pages/admin/manage-accounts":
+		case "/pages/employee/manage-accounts": {
+			try {
+				BranchHelper branchHelper = new BranchHelper();
+				Map<Integer, Branch> branchMap = branchHelper.getAllBranches();
+				request.setAttribute("branchMap", branchMap);
+				request.setAttribute("page_type", "manage-accounts");
+				request.setAttribute("page_name", "addAccount");
+				request.removeAttribute("warning");
+				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
+			} catch (CustomBankException ex) {
+				request.setAttribute("warning", ex.getMessage());
+				request.setAttribute("page_type", "manage-accounts");
+				request.setAttribute("page_name", "addAccount");
+				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
+			}
+			break;
+		}
+
+		case "/pages/admin/addAccount":
+		case "/pages/employee/addAccount": {
+			try {
+				String customerIdString = request.getParameter("customerId");
+				String branchIdString = request.getParameter("branchId");
+				String openingBalanceString = request.getParameter("openingBalance");
+
+				if (customerIdString == null && branchIdString == null && openingBalanceString == null) {
+					throw new CustomBankException("");
+				}
+
+				int customerId = Integer.parseInt(customerIdString);
+
+				CustomerHelper customerHelper = new CustomerHelper();
+				Customer currCustomer = customerHelper.getCustomer(customerId);
+				if (currCustomer == null || currCustomer.getType() != UserType.Customer.getType()) {
+					throw new CustomBankException("Customer not exists! Check id or add customer first!");
+				}
+				int branchId = Integer.parseInt(branchIdString);
+				Double openingBalance = Double.parseDouble(openingBalanceString);
+				AccountHelper accountHelper = new AccountHelper();
+				Account newAccount = new Account();
+				newAccount.setBalance(openingBalance);
+				newAccount.setBranchId(branchId);
+				newAccount.setCustomerId(customerId);
+				newAccount.setStatus(AccountStatus.ACTIVE.getStatus());
+				accountHelper.addAccount(newAccount);
+				request.setAttribute("success", "Account added successfully!");
+				if (path.startsWith("/pages/admin")) {
+					request.getRequestDispatcher("/pages/admin/manage-accounts").forward(request, response);
+				} else {
+					request.getRequestDispatcher("/pages/employee/manage-accounts").forward(request, response);
+				}
+			} catch (CustomBankException ex) {
+				request.setAttribute("failure", ex.getMessage());
+				if (path.startsWith("/pages/admin")) {
+					request.getRequestDispatcher("/pages/admin/manage-accounts").forward(request, response);
+				} else {
+					request.getRequestDispatcher("/pages/employee/manage-accounts").forward(request, response);
+				}
+			}
+			break;
+		}
+
+		case "/pages/admin/getAccount":
+		case "/pages/employee/getAccount": {
+			request.setAttribute("page_type", "manage-accounts");
+			request.setAttribute("page_name", "viewAccount");
+			request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
+			break;
+		}
+
+		case "/pages/admin/viewAccount":
+		case "/pages/employee/viewAccount": {
+			try {
+				String accountNumberString = request.getParameter("viewAccountNo");
+				if (accountNumberString.equals("")) {
+					throw new CustomBankException("");
+				}
+				long accountNumber = Long.parseLong(accountNumberString);
+				AccountHelper accountHelper = new AccountHelper();
+				Account account = accountHelper.getAccount(accountNumber);
+				if (path.startsWith("/pages/employee")) {
+					if ((int) request.getSession().getAttribute("employeeBranchId") != account.getBranchId()) {
+						throw new CustomBankException("You don't have access to this account!");
+					}
+				}
+				request.setAttribute("searched-account", account);
+				if (path.startsWith("/pages/admin")) {
+					request.getRequestDispatcher("/pages/admin/getAccount").forward(request, response);
+				} else {
+					request.getRequestDispatcher("/pages/employee/getAccount").forward(request, response);
+				}
+			} catch (CustomBankException ex) {
+				request.setAttribute("failure-message", ex.getMessage());
+				if (path.startsWith("/pages/admin")) {
+					request.getRequestDispatcher("/pages/admin/getAccount").forward(request, response);
+				} else {
+					request.getRequestDispatcher("/pages/employee/getAccount").forward(request, response);
+				}
+			}
+			break;
+		}
+
+		case "/pages/admin/changeStatus":
+		case "/pages/employee/changeStatus": {
+			try {
+				String accountNumberString = request.getParameter("accountNo");
+				long accountNo = Long.parseLong(accountNumberString);
+				String statusString = request.getParameter("status");
+				AccountHelper accountHelper = new AccountHelper();
+				if (statusString.equals(AccountStatus.ACTIVE.toString())) {
+					accountHelper.inActivateAccount(accountNo);
+				} else {
+					accountHelper.activateAccount(accountNo);
+				}
+				request.setAttribute("success-message", "Account status updated successfully!");
+				if (path.startsWith("/pages/admin")) {
+					request.getRequestDispatcher("/pages/admin/getAccount").forward(request, response);
+				} else {
+					request.getRequestDispatcher("/pages/employee/getAccount").forward(request, response);
+				}
+
+			} catch (CustomBankException ex) {
+				request.setAttribute("failure-message", ex.getMessage());
+				if (path.startsWith("/pages/admin")) {
+					request.getRequestDispatcher("/pages/admin/getAccount").forward(request, response);
+				} else {
+					request.getRequestDispatcher("/pages/employee/getAccount").forward(request, response);
+				}
+			}
+			break;
+		}
+
+		case "/pages/admin/deposit": {
+			request.setAttribute("page_type", "manage-transactions");
+			request.setAttribute("page_name", "deposit");
+			if (request.getAttribute("failure-info") != null) {
+				request.setAttribute("failure-info", (String) request.getAttribute("failure-info"));
+				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
+			} else if (request.getAttribute("success-info") != null) {
+				request.setAttribute("success-info", (String) request.getAttribute("success-info"));
+				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
+			} else if (request.getParameter("amount") == null) {
+				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
+			} else {
+				request.getRequestDispatcher("/pages/admin/doDeposit").forward(request, response);
 			}
 			break;
 		}
@@ -787,7 +935,6 @@ public class MainController extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

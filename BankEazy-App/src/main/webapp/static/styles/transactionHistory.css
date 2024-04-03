@@ -7,6 +7,7 @@
 #page-container {
 	width: 85%;
 	height: fit-content;
+	display:inline;
 }
 
 #history-header {

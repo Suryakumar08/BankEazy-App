@@ -44,6 +44,7 @@ public class AccountDAO implements AccountDaoInterface {
 				}
 			}
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new CustomBankException(CustomBankException.ERROR_OCCURRED, e);
 		}
 		return accNo;
@@ -77,7 +78,6 @@ public class AccountDAO implements AccountDaoInterface {
 				return accountMap;
 			}
 		} catch (SQLException e) {
-			e.printStackTrace();
 			throw new CustomBankException(CustomBankException.ERROR_OCCURRED, e);
 		}
 	}

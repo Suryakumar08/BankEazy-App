@@ -38,20 +38,20 @@
 				<div>
 					<label for="recipientAccountNo">Recipient Account Number *</label>
 					<input type="number" name="recipientAccountNo"
-						id="recipient-acc-no" required>
+						id="recipient-acc-no" required placeholder="Enter Recipient Account No">
 				</div>
 				<div>
 					<label for="transactionAmount">Amount *</label> <input
 						type="number" name="transactionAmount" id="trans-amt" step="0.1"
-						min="0.1" max="20000" required>
+						min="0.01" max="20000" required placeholder="Enter amount">
 				</div>
 				<div>
 					<label for="description">Transaction Description</label> <input
-						type="text" name="description" id="description" maxlength="50">
+						type="text" name="description" id="description" maxlength="50" placeholder="Description">
 				</div>
 				<div>
 				<label for="password">Password *</label> <input type="password"
-						name="password" id="deposit-password" required>
+						name="password" id="deposit-password" required placeholder="Password">
 				</div>
 
 				<%if(request.getAttribute("failure-info") != null){ %>
@@ -63,7 +63,7 @@
                             	alert("Your Transaction reference no is : " + referenceNo);
                             </script>
                     <span class="info-bar success"><span class="info-icon">&check;</span><span> <%=request.getAttribute("success-info") %></span></span>
-                            <%} %> <br>
+                            <%} %>
 				<button type="submit">Send</button>
 			</form>
 		</div>

@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import daos.CustomerDaoInterface;
+import enums.UserStatus;
 import enums.UserType;
 import exception.CustomBankException;
 import model.Customer;
@@ -51,6 +52,7 @@ public class CustomerHelper {
 		Customer dummyCustomer = new Customer();
 		dummyCustomer.setId(customerId);
 		Map<Integer, Customer> customerMap =  customerDao.getCustomers(dummyCustomer, 1, 0);
+		Validators.checkNull(customerMap, "Customer Not found!");
 		return customerMap.get(customerId);
 	}
 	
@@ -99,6 +101,22 @@ public class CustomerHelper {
 	public boolean updateCustomer(Customer customer, int customerId) throws CustomBankException{
 		Validators.checkNull(customer);
 		return customerDao.updateCustomer(customer, customerId);
+	}
+
+	public void inActivateCustomer(int customerId) throws CustomBankException{
+		Customer customer = getCustomer(customerId);
+		if(customer.getStatus() == UserStatus.ACTIVE.getStatus()) {
+			customer.setStatus(UserStatus.INACTIVE.getStatus());
+			updateCustomer(customer, customerId);
+		}
+	}
+
+	public void activateIfInactive(int customerId) throws CustomBankException{
+		Customer customer = getCustomer(customerId);
+		if(customer.getStatus() == UserStatus.INACTIVE.getStatus()) {
+			customer.setStatus(UserStatus.ACTIVE.getStatus());
+			updateCustomer(customer, customerId);
+		}
 	}
 	
 }
