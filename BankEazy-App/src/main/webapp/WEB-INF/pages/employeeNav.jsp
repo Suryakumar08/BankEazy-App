@@ -16,10 +16,11 @@
 		<a class="nav-item ${page_type eq 'manage-user' ? 'selected' : '' }" href="<%=request.getContextPath() %>/admin/home">User</a>
 		<%} %>
 		<a class="nav-item ${page_type eq 'manage-accounts' ? 'selected' : '' }" href="manage-accounts">Accounts</a>
-		<a class="nav-item ${page_type eq 'manage-transactions' ? 'selected' : '' }" href="transactionHistory">Transactions</a>
+		<a class="nav-item ${page_type eq 'manage-transactions' ? 'selected' : '' }" href="manage-transactions">Transactions</a>
 		<a class="nav-item" href="about">About</a>
 		<div class="dropdown">
 			<button class="dropbtn" onclick="toggleDropDownContent()">
+			<span style="color:white; margin-right:5px;"><%=session.getAttribute("userName") %></span>
 				<i class="fa-solid fa-user"></i> <i id="down-btn"
 					class="fa fa-caret-down"></i><i id="up-btn"
 					class="fa-solid fa-caret-up"></i>

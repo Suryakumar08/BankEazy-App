@@ -1,3 +1,4 @@
+<%@page import="enums.UserType"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -20,13 +21,14 @@
 				<%@ page import="java.util.Map"%>
 				<%@ page import="model.Account"%>
 				<%@ page import="enums.AccountStatus"%>
+				<%if((int)session.getAttribute("userType") == UserType.Customer.getType()){ %>
 				<%@ page import="org.json.JSONObject"%>
 				<%
 				Map<Long, JSONObject> customerAccounts = (Map<Long, JSONObject>) request.getAttribute("customerAccounts");
 				%>
 				<div>
 					<label for="selected-account">Select Account</label> <select
-						name="selected-account" id="accounts-select" required>
+						name="selected-account" id="accounts-select" required autofocus="autofocus">
 						<option value="null" selected hidden disabled>Select
 							Account</option>
 						<%
@@ -41,6 +43,16 @@
 						%>
 					</select>
 				</div>
+				<%}else{ %>
+					<div>
+						<label for="selected-account" class="label">Select Account</label>
+						<%if(request.getParameter("selected-account") == null){ %>
+						<input name="selected-account" type="number" placeholder="Enter account no" required autofocus="autofocus">
+						<%}else{ %>
+						<input name="selected-account" type="number" required autofocus="autofocus">
+						<%} %>
+					</div>
+				<%} %>
 				<div>
 					<label for="amount">Amount *</label> <input type="number" min="100"
 						max="20000" step="100" name="amount" id="withdraw-input" required placeholder="Enter amount">

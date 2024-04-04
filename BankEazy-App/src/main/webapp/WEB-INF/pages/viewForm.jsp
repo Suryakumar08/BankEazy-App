@@ -25,7 +25,7 @@
         <!-- Name -->
         <div>
             <label for="name" class="label">Name:</label>
-            <input type="text" name="name" class="input" value="<%= user.getName() %>" required>
+            <input type="text" name="name" class="input" value="<%= user.getName() %>" required autofocus="autofocus">
         </div>
         
         <!-- Phone -->
@@ -75,7 +75,7 @@
         <!-- Type -->
         <div>
             <label for="type" class="label">Type:</label>
-            <select name="type" class="select" readOnly required>
+            <select name="type" class="select" readOnly required disabled="disabled">
                     <% for (UserType currUserType : UserType.values()) { %>
                         <option value="<%= currUserType.toString() %>"
                             <%= (currUserType.getType() == user.getType()) ? "selected" : ""%>>
@@ -118,7 +118,7 @@
 			<%Map<Integer, Branch> branchMap = (Map<Integer, Branch>)request.getAttribute("branchMap");
 			%>
 			<label class="label" for="branch">Branch*</label>
-			<select class="select" id="select-branch" name="branch" required%>>
+			<select class="select" id="select-branch" name="branch" required disabled="disabled">
 			<%for(Map.Entry<Integer, Branch> branch : branchMap.entrySet()){
 				int currBranchId = branch.getKey();
 				String currBranchIdString = "" + currBranchId;

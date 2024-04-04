@@ -34,9 +34,6 @@ public class StaticFilter implements javax.servlet.Filter {
 		else if(path.startsWith("/home")) {
 			request.getRequestDispatcher("/pages" + path).forward(request, response);
 		}
-		else if(path.startsWith("/static")) {
-			chain.doFilter(request, response);
-		}
 		else {
 		    chain.doFilter(request, response);
 		}

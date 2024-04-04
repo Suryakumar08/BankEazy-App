@@ -21,7 +21,7 @@
 				%>
 				<div>
 					<label for="selected-account">Select Account</label> <select
-						name="selected-account" id="accounts-select" required>
+						name="selected-account" id="accounts-select" required autofocus="autofocus">
 						<option value="null" selected hidden disabled>Select Account</option>
 						<%
 						for (Long accountNumber : customerAccounts.keySet()) {

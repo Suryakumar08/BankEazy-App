@@ -15,7 +15,7 @@
 			<div class="customer-id-div">
 				<label class="label" for="customerId">Customer id :</label> <input
 					type="number" class="input" name="customerId"
-					placeholder="Enter customer Id" required>
+					placeholder="Enter customer Id" required autofocus="autofocus">
 			</div>
 			<%
 			if ((int) session.getAttribute("userType") == UserType.Employee.getType()) {

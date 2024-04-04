@@ -14,7 +14,7 @@
 		<div>
 			<form class="view-account-form" method="get" action="viewAccount">
 				<div class="search-bar-div">
-					<input class="search-input" type="number" name="viewAccountNo" placeholder="Enter Account no">
+					<input class="search-input" type="number" name="viewAccountNo" placeholder="Enter Account no" autofocus="autofocus">
 				</div>
 				<div>
 					<button type="submit" class="button">Search</button>

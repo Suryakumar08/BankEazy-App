@@ -20,7 +20,7 @@
 			<%if((int)session.getAttribute("userType") != UserType.Customer.getType()){ %>
 			<div>
 				<label for=selectedAccount>Enter Account No</label>
-				<input name="selectedAccount" placeholder="Enter Account No" type="number" required value="${param.selectedAccount }">
+				<input name="selectedAccount" placeholder="Enter Account No" type="number" autofocus="autofocus" required value="${param.selectedAccount }">
 			</div>
 			<%}else{ %>
 			
@@ -36,7 +36,7 @@
 				%>
 				<div>
 					<label for="selectedAccount">Select Account</label> <select
-						name="selectedAccount" id="accounts-select" required>
+						name="selectedAccount" id="accounts-select" required autofocus="autofocus">
 						<%
 						if (request.getAttribute("selected-account") == null) {
 							isHiddenSelected = true;

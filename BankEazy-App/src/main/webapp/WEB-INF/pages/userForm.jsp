@@ -10,13 +10,13 @@
 <%@ page import="enums.UserType" %>
 	<form id="dataForm" method="post">
 			<%
+			String successMessage = (String)request.getAttribute("success-message");
 			if ((int) session.getAttribute("userType") == UserType.Admin.getType()) {
-				System.out.println("Success-message : " + request.getAttribute("success-message"));
 			%>
 			<div>
 				<label for="newUserType" class="label">User Type*</label> <select
 					id="select-type" name="newUserType" class="select" required
-					onchange="handleFormView()">
+					onchange="handleFormView()" autofocus="autofocus">
 					<%if(request.getAttribute("success-message") != null || request.getParameter("newUserType") == null){ %>
 					<option value="null" selected hidden disabled>select
 						user type</option>
@@ -43,13 +43,13 @@
 			<div>
 				<label for="newUserName" class="label">User Name* : </label> <input
 					type="text" class="input" name="newUserName"
-					value="${success-message eq null ? param.newUserName : ''}" required>
+					value="${successMessage eq null? param.newUserName : ''}" required placeholder="User Name">
 			</div>
 			<div>
 				<label for="newUserMobile" class="label">Mobile*</label> <input
 					type="number" class="input" name="newUserMobile"
-					value="${success-message eq null ? param.newUserMobile : ''}" inputmode="numeric"
-					required>
+					value="${successMessage eq null ? param.newUserMobile : ''}" inputmode="numeric"
+					required placeholder="Mobile">
 			</div>
 			<div>
 				<label for="newUserGender" class="label">Gender*</label> <select
@@ -70,22 +70,22 @@
 			<div>
 				<label for="newUserDob" class="label">Date of Birth*</label> <input
 					type="date" name="newUserDob" class="input"
-					value="${success-message eq null ? param.newUserDob : ''}" required>
+					value="${successMessage eq null ? param.newUserDob : ''}" required>
 			</div>
 			<div class="customer-tags" style="display: none;">
 				<label for="newUserPan" class="label">Pan*</label> <input type="text"
-					name="newUserPan" class="input" value="${success-message eq null ? param.newUserPan : ''}"
-					<%= request.getAttribute("newUserPan") == null ? "" : "required"%>>
+					name="newUserPan" class="input" value="${successMessage eq null ? param.newUserPan : ''}"
+					<%= request.getAttribute("newUserPan") == null ? "" : "required"%> placeholder="Pan number">
 			</div>
 			<div class="customer-tags" style="display: none;">
 				<label for="newUserAadhar" class="label">Aadhar*</label> <input type="number"
-					name="newUserAadhar" class="input" value="${success-message eq null ? param.newUserAadhar : ''}"
-					<%= request.getAttribute("newUserAadhar") == null ? "" : "required"%>>
+					name="newUserAadhar" class="input" value="${successMessage eq null ? param.newUserAadhar : ''}"
+					<%= request.getAttribute("newUserAadhar") == null ? "" : "required"%> placeholder="Aadhar number">
 			</div>
 			<div class="employee-tags" style="display: none;">
 				<label for="newUserSalary" class="label">Salary*</label> <input type="number"
-					name="newUserSalary" class="input" value="${success-message eq null ? param.newUserSalary : ''}"
-					<%= request.getAttribute("newUserSalary") == null ? "" : "required"%>>
+					name="newUserSalary" class="input" value="${successMessage eq null ? param.newUserSalary : ''}"
+					<%= request.getAttribute("newUserSalary") == null ? "" : "required"%> placeholder="Salary">
 			</div>
 			<div class="employee-tags" style="display: none;">
 			<%@ page import="java.util.Map" %>
@@ -111,7 +111,7 @@
 				<%} %>
 			</select>
 			</div>
-			<div class="info-bar" style="display: ${success-message eq null and failure-message eq null ? 'none' : 'flex'}">
+			<div class="info-bar" style="display: ${successMessage eq null and failure-message eq null ? 'none' : 'flex'}">
 			<%if(request.getAttribute("success-message") != null){ %>
 				<span class="success"><%=(String)request.getAttribute("success-message") %></span>
 				<%}else if(request.getAttribute("failure-message") != null){ %>

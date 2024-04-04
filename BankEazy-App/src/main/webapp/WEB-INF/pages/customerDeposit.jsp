@@ -24,7 +24,7 @@
 				%>
 				<div>
 					<label for="selected-account">Select Account</label> <select
-						name="selected-account" id="accounts-select" required>
+						name="selected-account" id="accounts-select" required autofocus="autofocus">
 						<option value="null" selected hidden disabled>Select Account</option>
 						<%
 						for (Long accountNumber : customerAccounts.keySet()) {
@@ -41,7 +41,11 @@
 				<%}else{ %>
 					<div>
 						<label for="selected-account" class="label">Select Account</label>
-						<input name="selected-account" placeholder="Account No" value="${param.selected-account }">
+						<%if(request.getParameter("selected-account") == null){ %>
+						<input name="selected-account" type="number" autofocus="autofocus" placeholder="Enter account no" required>
+						<%}else{ %>
+						<input name="selected-account" type="number" required autofocus="autofocus">
+						<%} %>
 					</div>
 				<%} %>
 				<div>

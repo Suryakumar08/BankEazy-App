@@ -13,6 +13,7 @@
 		<a class="nav-item" href="about">About</a>
 		<div class="dropdown">
 			<button class="dropbtn" onclick="toggleDropDownContent()">
+			<span style="color:white; margin-right:5px;"><%=session.getAttribute("userName") %></span>
 				<i class="fa-solid fa-user"></i> <i id="down-btn"
 					class="fa fa-caret-down"></i><i id="up-btn"
 					class="fa-solid fa-caret-up"></i>

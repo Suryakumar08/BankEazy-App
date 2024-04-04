@@ -25,19 +25,16 @@ public class EmployeeFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest)request;
 		String path = req.getRequestURI().substring(req.getContextPath().length());
 		HttpSession session = req.getSession(false);
-		System.out.println("In Employee filter !!!");
 		if(session == null || session.getAttribute("userType") == null) {
-			System.out.println("Hello from session null employee filter");
 			request.setAttribute("warning", "Please Login to continue!!!");
 			req.getRequestDispatcher("/static/login.jsp").forward(request, response);
 		}
 		else if((int)session.getAttribute("userType") != UserType.Employee.getType()) {
-			System.out.println("hii from type check employee filter");
 			request.setAttribute("warning", "Access denied! Please Login!");
-			request.getRequestDispatcher(req.getContextPath() + "/static/login.jsp").forward(request, response);
+			request.getRequestDispatcher("/static/login.jsp").forward(request, response);
 		}
 		else {
-			request.getRequestDispatcher("/pages" + path).forward(request, response);
+			chain.doFilter(request, response);
 		}
 	}
 

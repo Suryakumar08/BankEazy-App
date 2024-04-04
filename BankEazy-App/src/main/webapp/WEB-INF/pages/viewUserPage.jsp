@@ -8,38 +8,38 @@
 <title>View User</title>
 </head>
 <body>
-	
+
 	<div class="view-user-body">
 		<%
 		if (request.getAttribute("searched-user") == null) {
 		%>
-		<div>
-			<form class="view-user-form" method="get" action="getUser">
-				<div class="search-bar-div">
-					<input class="search-input" type="number" name="viewUserId" placeholder="Enter User Id">
-				</div>
-				<div>
-					<button type="submit" class="button">Search</button>
-				</div>
-			</form>
-		</div>
+		<form class="view-user-form" method="get" action="getUser">
+			<div class="search-bar-div">
+				<input class="search-input" type="number" name="viewUserId"
+					placeholder="Enter User Id" autofocus="autofocus" max="999999999"
+					min="1">
+			</div>
+			<div>
+				<button type="submit" class="button">Search</button>
+			</div>
+		</form>
+
 		<%
 		if (request.getAttribute("failure-message") != null) {
 		%>
 		<div class="message-div">
-			<span style="color: red; width: 70%"><%= (String)request.getAttribute("failure-message") %></span>
+			<span style="color: red; width: 70%"><%=(String) request.getAttribute("failure-message")%></span>
 		</div>
 		<%
 		}
 		if (request.getAttribute("success-message") != null) {
 		%>
 		<div class="message-div">
-			<span style="color: green; width: 70%"><%= (String)request.getAttribute("success-message") %></span>
+			<span style="color: green; width: 70%"><%=(String) request.getAttribute("success-message")%></span>
 		</div>
 		<%
 		}
-		}
-		 else if (request.getAttribute("searched-user") != null) {
+		} else if (request.getAttribute("searched-user") != null) {
 		%>
 		<jsp:include page="viewForm.jsp"></jsp:include>
 		<%

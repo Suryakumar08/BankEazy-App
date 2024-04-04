@@ -32,6 +32,14 @@
 		<url-pattern>/user/*</url-pattern>
 	</filter-mapping>
 	<filter>
+		<filter-name>customerValidationFilter</filter-name>
+		<filter-class>com.filters.ValidationFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>customerValidationFilter</filter-name>
+		<url-pattern>/user/*</url-pattern>
+	</filter-mapping>
+	<filter>
 		<filter-name>adminFilter</filter-name>
 		<filter-class>com.filters.AdminFilter</filter-class>
 	</filter>
@@ -40,12 +48,12 @@
 		<url-pattern>/admin/*</url-pattern>
 	</filter-mapping>
 	<filter>
-		<filter-name>adminAddCustomerFilter</filter-name>
-		<filter-class>com.filters.AddCustomerFilter</filter-class>
+		<filter-name>adminValidationFilter</filter-name>
+		<filter-class>com.filters.ValidationFilter</filter-class>
 	</filter>
 	<filter-mapping>
-		<filter-name>adminAddCustomerFilter</filter-name>
-		<url-pattern>/admin/addCustomer</url-pattern>
+		<filter-name>adminValidationFilter</filter-name>
+		<url-pattern>/admin/*</url-pattern>
 	</filter-mapping>
 	<filter>
 		<filter-name>employeeFilter</filter-name>
@@ -56,20 +64,12 @@
 		<url-pattern>/employee/*</url-pattern>
 	</filter-mapping>
 	<filter>
-		<filter-name>employeeAddCustomerFilter</filter-name>
-		<filter-class>com.filters.AddCustomerFilter</filter-class>
+		<filter-name>employeeValidationFilter</filter-name>
+		<filter-class>com.filters.ValidationFilter</filter-class>
 	</filter>
 	<filter-mapping>
-		<filter-name>employeeAddCustomerFilter</filter-name>
-		<url-pattern>/employee/addCustomer</url-pattern>
-	</filter-mapping>
-	<filter>
-		<filter-name>AdminAddEmployeeFilter</filter-name>
-		<filter-class>com.filters.AddEmployeeFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>AdminAddEmployeeFilter</filter-name>
-		<url-pattern>/admin/addEmployee</url-pattern>
+		<filter-name>employeeValidationFilter</filter-name>
+		<url-pattern>/employee/*</url-pattern>
 	</filter-mapping>
 	<session-config>
 		<session-timeout>30</session-timeout>

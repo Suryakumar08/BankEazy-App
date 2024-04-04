@@ -40,14 +40,14 @@ function makeHidden(className) {
 }
 
 function addUserFormSubmitter() {
-	let formEl = document.getElementById('form');
+	let formEl = document.getElementById('dataForm');
 	let addingUsertype = document.getElementById('select-type').value;
 	console.log(addingUsertype);
 	if (addingUsertype === 'Customer') {
-		form.action = 'addCustomer';
+		formEl.action = 'addCustomer';
 	}
 	else {
-		form.action = 'addEmployee';
+		formEl.action = 'addEmployee';
 	}
-	form.submit();
+	formEl.submit();
 }
