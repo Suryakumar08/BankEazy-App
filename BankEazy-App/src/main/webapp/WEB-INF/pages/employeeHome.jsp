@@ -92,7 +92,6 @@
 		break;
 	}
 	case "transactionHistory":{
-		System.out.println("In manage-transactions case");
 	%>
 	<jsp:include page="customerTransactionHistory.jsp"></jsp:include>
 	<script>

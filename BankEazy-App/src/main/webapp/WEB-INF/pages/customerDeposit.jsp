@@ -11,6 +11,14 @@
 </head>
 <body>
 	<div id="deposit-body">
+	<%if((int)session.getAttribute("userType") == UserType.Customer.getType() && request.getAttribute("customerAccounts") == null){ %>
+		
+			<div>
+				<p style="color: red;">You don't have Accounts! Contact nearby Branch for further
+					enquiries!</p>
+			</div>
+			</div>
+		<%} else{%>
 		<div class="operation-body">
 			<form action="deposit" method="post" autocomplete="off" class="dataForm">
 				<%@ page import="java.util.Map"%>
@@ -74,5 +82,6 @@
 			</form>
 		</div>
 	</div>
+	<%} %>
 </body>
 </html>

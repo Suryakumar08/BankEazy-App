@@ -29,7 +29,6 @@
 					<%@ page import="enums.TransactionStatus" %>
 					<%
 					for (Transaction transaction : ((List<Transaction>) request.getAttribute("transactions"))) {
-						System.out.println("In transaction table : " + transaction.toString());
 					%>
 					<tr>
 						<td><%=transaction.getTransactionId()%></td>

@@ -44,11 +44,11 @@
 
 .transaction-table{
 	border-radius: 10px;
+	border-collapse: collapse;
 }
 
 .transaction-table thead{
-    background-color: #5e84ab;
-    border: 2px #ccc solid;
+    background-color: #5f80b6;
 }
 
 .transaction-table thead th{
@@ -57,7 +57,11 @@
 }
 
 .transaction-table tbody{
-    background-color: #9aaec0;
+    background-color: #99bce0;
+}
+
+.transaction-table tbody tr:nth-child(even){
+	background-color: #b2cde8;
 }
 
 .transaction-table tbody tr td{

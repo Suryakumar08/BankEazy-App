@@ -13,6 +13,14 @@
 </head>
 <body>
 	<div id="page-container">
+	<%if((int)session.getAttribute("userType") == UserType.Customer.getType() && request.getAttribute("customerAccounts") == null){ %>
+		
+			<div>
+				<p style="color: red; margin-left:35%;margin-top:28%;">You don't have Accounts! Contact nearby Branch for further
+					enquiries!</p>
+			</div>
+			</div>
+		<%}else{ %>
 		<form id="form" action="transactionHistory" method="post">
 		<div id="history-header">
 			<div class="accounts">
@@ -138,5 +146,6 @@
 		</div>
 		<%} %>
 		</div>
+		<%} %>
 </body>
 </html>

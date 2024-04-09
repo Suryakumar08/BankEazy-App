@@ -32,8 +32,9 @@
 			<%@ page import="model.Branch"%>
 			<%@ page import="enums.AccountStatus" %>
 			<%
-			Map<Long, JSONObject> customerAccounts = (Map<Long, JSONObject>) request.getAttribute("customerAccounts");
-			if (customerAccounts != null) {
+			Object customerAccountsObj = request.getAttribute("customerAccounts");
+			if (customerAccountsObj != null) {
+			Map<Long, JSONObject> customerAccounts = (Map<Long, JSONObject>) (customerAccountsObj);
 				int index = 0;
 				for (Map.Entry<Long, JSONObject> el : customerAccounts.entrySet()) {
 					index++;
@@ -79,7 +80,7 @@
 			} else {
 			%>
 			<div>
-				<p>You don't have Accounts! Contact nearby Branch for further
+				<p style="color: red;">You don't have Accounts! Contact nearby Branch for further
 					enquiries!</p>
 			</div>
 			<%

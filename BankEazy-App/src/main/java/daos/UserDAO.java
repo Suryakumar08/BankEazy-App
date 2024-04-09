@@ -44,7 +44,6 @@ public class UserDAO implements UserDaoInterface {
 	@Override
 	public void updateUser(User user, int userId) throws CustomBankException {
 		DAOHelper daoHelper = new DAOHelper();
-
 		StringBuilder updateQuery = new StringBuilder("Update User");
 		updateQuery.append(daoHelper.generateUpdateQuery(user));
 		updateQuery.append(" where User.id = ?");

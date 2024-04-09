@@ -43,16 +43,20 @@ public class TransactionHelper {
 	}
 
 	// create
-	public long depositAmount(long accountNo, double amount) throws CustomBankException {
+	public long depositAmount(long accountNo, double amount, long lastModifiedOn, int lastModifiedBy) throws CustomBankException {
 		Validators.checkRangeBound(amount, TransactionHelper.MIN_DEPOSIT, TransactionHelper.MAX_DEPOSIT, "Invalid Deposit Amount!");
 		Transaction currTransaction = setSelfTransactionDetails(accountNo, amount);
+		currTransaction.setLastModifiedBy(lastModifiedBy);
+		currTransaction.setLastModifiedOn(lastModifiedOn);
 		currTransaction.setTypeFromEnum(TransactionType.DEPOSIT);
 		return makeBankTransaction(currTransaction, false);
 	}
 
-	public long withdrawAmount(long accountNo, double amount) throws CustomBankException {
+	public long withdrawAmount(long accountNo, double amount, long lastModifiedOn, int lastModifiedBy) throws CustomBankException {
 		Validators.checkRangeBound(amount, TransactionHelper.MIN_WITHDRAW, TransactionHelper.MAX_WITHDRAW, "Invalid Withdraw Amount!");
 		Transaction currTransaction = setSelfTransactionDetails(accountNo, amount);
+		currTransaction.setLastModifiedBy(lastModifiedBy);
+		currTransaction.setLastModifiedOn(lastModifiedOn);
 		currTransaction.setTypeFromEnum(TransactionType.WITHDRAW);
 		return makeBankTransaction(currTransaction, false);
 	}

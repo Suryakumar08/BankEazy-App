@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
+import com.cache.AccountLRUCache;
+
 import daos.AccountDaoInterface;
 import enums.AccountStatus;
 import exception.CustomBankException;
@@ -54,6 +56,11 @@ public class AccountHelper {
 	
 
 	public Account getAccount(long accountNo) throws CustomBankException {
+		AccountLRUCache accountCache = new AccountLRUCache();
+		Account resultAccount;
+		if((resultAccount = accountCache.get(accountNo)) != null) {
+			return resultAccount;
+		}
 		Account dummyAccount = new Account();
 		dummyAccount.setAccountNo(accountNo);
 		Map<Long, Account> accountMap = accountDao.getAccounts(dummyAccount, 1, 0);
@@ -63,7 +70,9 @@ public class AccountHelper {
 		catch(CustomBankException ex) {
 			throw new CustomBankException("Account not found!");
 		}
-		return accountMap.get(accountNo);
+		resultAccount = accountMap.get(accountNo);
+		accountCache.set(accountNo, resultAccount);
+		return resultAccount;
 	}
 
 	
@@ -88,6 +97,9 @@ public class AccountHelper {
 		Account dummyAccount = new Account();
 		dummyAccount.setCustomerId(customerId);
 		Map<Long, Account> accountMap = getAccounts(dummyAccount);
+		if(accountMap == null) {
+			return null;
+		}
 		BranchHelper branchHelper = new BranchHelper();
 		Map<Integer, Branch> branchMap = branchHelper.getAllBranches();
 		for(Map.Entry<Long, Account> element : accountMap.entrySet()) {
@@ -123,17 +135,19 @@ public class AccountHelper {
 		Account account = new Account();
 		account.setAccountNo(accountNo);
 		account.setBalance(amount);
-		return accountDao.updateAccount(account);
+		return updateAccount(account);
 	}
 	
 	public boolean updateAccount(Account account) throws CustomBankException{
 		Validators.checkNull(account);
 		Validators.checkNull(account.getAccountNo());
+		AccountLRUCache accountCache = new AccountLRUCache();
+		accountCache.remove(account.getAccountNo());
 		return accountDao.updateAccount(account);
 	}
 	
 	
-	public boolean inActivateAccount(long accountNo) throws CustomBankException{
+	public boolean inActivateAccount(long accountNo, long lastModifiedOn, int lastModifiedBy) throws CustomBankException{
 		Account account = getAccount(accountNo);
 		if(account == null) {
 			throw new CustomBankException("Account not found!");
@@ -154,7 +168,9 @@ public class AccountHelper {
 		boolean isUpdated = false;
 		if(account.getStatus() == AccountStatus.ACTIVE.getStatus()) {
 			account.setStatus(AccountStatus.INACTIVE.getStatus());
-			isUpdated = accountDao.updateAccount(account);	
+			account.setLastModifiedBy(lastModifiedBy);
+			account.setLastModifiedOn(lastModifiedOn);
+			isUpdated = updateAccount(account);	
 			if(!hasAnotherActiveAccount) {
 				CustomerHelper customerHelper = new CustomerHelper();
 				customerHelper.inActivateCustomer(customerId);
@@ -164,7 +180,7 @@ public class AccountHelper {
 	}
 	
 	
-	public boolean activateAccount(long accountNo) throws CustomBankException{
+	public boolean activateAccount(long accountNo, long lastModifiedOn, int lastModifiedBy) throws CustomBankException{
 		Account account = getAccount(accountNo);
 		if(account == null) {
 			throw new CustomBankException("Account not found!");
@@ -175,7 +191,9 @@ public class AccountHelper {
 		int customerId = account.getCustomerId();
 		new CustomerHelper().activateIfInactive(customerId);
 		account.setStatus(AccountStatus.ACTIVE.getStatus());
-		return accountDao.updateAccount(account);
+		account.setLastModifiedBy(lastModifiedBy);
+		account.setLastModifiedOn(lastModifiedOn);
+		return updateAccount(account);
 	}
 
 	

@@ -16,6 +16,20 @@ public class Transaction {
 	private Double closingBalance;
 	private Double amount;
 	private Long referenceNo;
+	private Long lastModifiedOn;
+	private Integer lastModifiedBy;
+	public Long getLastModifiedOn() {
+		return lastModifiedOn;
+	}
+	public void setLastModifiedOn(Long lastModifiedOn) {
+		this.lastModifiedOn = lastModifiedOn;
+	}
+	public Integer getLastModifiedBy() {
+		return lastModifiedBy;
+	}
+	public void setLastModifiedBy(Integer lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
+	}
 	public Long getTransactionId() {
 		return transactionId;
 	}

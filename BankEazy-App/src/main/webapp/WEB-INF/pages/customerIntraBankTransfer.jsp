@@ -9,7 +9,16 @@
 	href='<%=request.getContextPath()%>/static/styles/accountOperationsStyle.css'>
 </head>
 <body>
+		<%@ page import="enums.UserType" %>
 		<div id="intra-bank-transfer-body">
+		<%if((int)session.getAttribute("userType") == UserType.Customer.getType() && request.getAttribute("customerAccounts") == null){ %>
+		
+			<div>
+				<p style="color: red;">You don't have Accounts! Contact nearby Branch for further
+					enquiries!</p>
+			</div>
+			</div>
+		<%}else{ %>
 		<div class="operation-body">
 			<form action="intra-bank-transfer" method="post" autocomplete="off">
 				<%@ page import="java.util.Map"%>
@@ -42,7 +51,7 @@
 				</div>
 				<div>
 					<label for="transactionAmount">Amount *</label> <input
-						type="number" name="transactionAmount" id="trans-amt" step="0.1"
+						type="number" name="transactionAmount" id="trans-amt" step="0.01"
 						min="0.01" max="20000" required placeholder="Enter amount">
 				</div>
 				<div>
@@ -68,5 +77,6 @@
 			</form>
 		</div>
 	</div>
+	<%} %>
 </body>
 </html>

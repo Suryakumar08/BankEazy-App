@@ -72,10 +72,12 @@ public class UserHelper {
 	
 	
 	//update
-	public void changePassword(String newPassword, int userId) throws CustomBankException{
+	public void changePassword(String newPassword, int userId, long modifiedOn, int modifiedBy) throws CustomBankException{
 		Validators.checkNull(newPassword, "Password null!");
 		User user = new User();
 		user.setPassword(Sha_256.getHashedPassword(newPassword));
+		user.setLastModifiedBy(modifiedBy);
+		user.setLastModifiedOn(modifiedOn);
 		userDao.updateUser(user, userId);
 	}
 }

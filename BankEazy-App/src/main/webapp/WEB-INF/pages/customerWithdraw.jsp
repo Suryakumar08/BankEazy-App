@@ -11,6 +11,14 @@
 </head>
 <body>
 	<div id="withdraw-body">
+	<%if((int)session.getAttribute("userType") == UserType.Customer.getType() && request.getAttribute("customerAccounts") == null){ %>
+		
+			<div>
+				<p style="color: red;">You don't have Accounts! Contact nearby Branch for further
+					enquiries!</p>
+			</div>
+			</div>
+		<%}else{ %>
 		<div class="operation-body">
 			<form action="withdraw" method="post" autocomplete="off">
 				<%
@@ -79,6 +87,7 @@
 			</form>
 		</div>
 	</div>
+	<%} %>
 
 </body>
 </html>

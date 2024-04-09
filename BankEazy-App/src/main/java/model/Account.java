@@ -11,7 +11,21 @@ public class Account {
 	private Integer customerId;
 	private Double balance;
 	private Integer branchId;
-	private Integer status;		//1 -> Active 0 -> InActive
+	private Integer status;     //1 -> Active 0 -> InActive
+	private Long lastModifiedOn;
+	private Integer lastModifiedBy;
+	public Long getLastModifiedOn() {
+		return lastModifiedOn;
+	}
+	public void setLastModifiedOn(Long lastModifiedOn) {
+		this.lastModifiedOn = lastModifiedOn;
+	}
+	public Integer getLastModifiedBy() {
+		return lastModifiedBy;
+	}
+	public void setLastModifiedBy(Integer lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
+	}
 	public Long getAccountNo() {
 		return accountNo;
 	}

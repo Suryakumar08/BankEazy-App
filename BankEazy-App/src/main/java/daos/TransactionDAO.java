@@ -22,7 +22,7 @@ public class TransactionDAO implements TransactionDaoInterface {
 	private String addTransactionQuery = "insert into Transaction(customerId, accountNo, transactionAccountNo, description, type, status, time, closingBalance, transactionId, amount) values(?,?,?,?,?,?,?,?,?,?)";
 	private String lastTransactionIdQuery = "select MAX(transactionId) as maxId from Transaction";
 	private String getTransactionQuery = "select customerId, accountNo, transactionAccountNo, description, type, status, time, closingBalance, transactionId, amount, referenceNo from Transaction";
-	private String updateAmountQuery = "update Account set balance = ? where accountNo = ?";
+	private String updateAmountQuery = "update Account set balance = ?, lastModifiedOn = ?, lastModifiedBy = ? where accountNo = ?";
 	private String getNoOfTransactionsQuery = "select count(*) from Transaction where Transaction.accountNo = ? and Transaction.time between ? and ? order by time desc";
 
 	// create
@@ -71,7 +71,9 @@ public class TransactionDAO implements TransactionDaoInterface {
 
 				try (PreparedStatement amountUpdateStatement = connection.prepareStatement(updateAmountQuery)) {
 					amountUpdateStatement.setObject(1, transaction.getClosingBalance());
-					amountUpdateStatement.setObject(2, transaction.getAccountNo());
+					amountUpdateStatement.setObject(2, transaction.getLastModifiedOn());
+					amountUpdateStatement.setObject(3, transaction.getLastModifiedBy());
+					amountUpdateStatement.setObject(4, transaction.getAccountNo());
 
 					int affectedRows = amountUpdateStatement.executeUpdate();
 					if (affectedRows < 1) {

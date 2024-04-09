@@ -29,7 +29,7 @@
 			<form action="<%= request.getContextPath()%>/home" method="post">
 				<div>
 					<label for="userId">User ID</label> <br> <input type="number"
-						placeholder="Enter userId" maxlength="10" name="userId" required autofocus>
+						placeholder="Enter userId" max="99999999" name="userId" required autofocus>
 					<br> <br>
 				</div>
 				<div>

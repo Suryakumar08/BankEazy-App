@@ -20,7 +20,7 @@
 	<form action="updateUserDetails" method="post" class="update-user-form">
 	<div>
 	<label for="id" class="label">Id:</label>
-        <input type="text" name="userId" value="<%= user.getId() %>" readOnly required>
+        <input type="number" name="userId" value="<%= user.getId() %>" readOnly required>
         </div>
         <!-- Name -->
         <div>
@@ -39,15 +39,15 @@
             <label for="gender" class="label">Gender:</label>
             <select name="gender" class="select" required>
                     <option value="Male"
-                        <%= user.getGender() == "Male" ? "selected" : "" %>>
+                        <%= user.getGender().equals("Male") ? "selected" : "" %>>
                         Male
                     </option>
                     <option value="Male"
-                        <%= user.getGender() == "Female" ? "selected" : "" %>>
+                        <%= user.getGender().equals("Female") ? "selected" : "" %>>
                         Female
                     </option>
                     <option value="Male"
-                        <%= user.getGender() == "Other" ? "selected" : "" %>>
+                        <%= user.getGender().equals("Other") ? "selected" : "" %>>
                         Other
                     </option>
             </select>
@@ -75,14 +75,15 @@
         <!-- Type -->
         <div>
             <label for="type" class="label">Type:</label>
-            <select name="type" class="select" readOnly required disabled="disabled">
+            <input name="type" class="input" value="<%=user.getTypeAsString() %>" required readOnly>
+            <%-- <select name="type" class="select" readOnly required disabled="disabled">
                     <% for (UserType currUserType : UserType.values()) { %>
                         <option value="<%= currUserType.toString() %>"
                             <%= (currUserType.getType() == user.getType()) ? "selected" : ""%>>
                             <%= currUserType.toString() %>
                         </option>
                     <% } %>
-                </select>
+                </select> --%>
         </div>
         
         <!-- Display specific fields based on UserType -->
@@ -112,13 +113,13 @@
             </div>
             
             <!-- Branch ID -->
-            <div class="employee-tags" style="display: none;">
+            <div>
 			<%@ page import="java.util.Map" %>
 			<%@ page import="model.Branch" %>
 			<%Map<Integer, Branch> branchMap = (Map<Integer, Branch>)request.getAttribute("branchMap");
 			%>
 			<label class="label" for="branch">Branch*</label>
-			<select class="select" id="select-branch" name="branch" required disabled="disabled">
+			<select class="select" id="select-branch" name="branch" required>
 			<%for(Map.Entry<Integer, Branch> branch : branchMap.entrySet()){
 				int currBranchId = branch.getKey();
 				String currBranchIdString = "" + currBranchId;

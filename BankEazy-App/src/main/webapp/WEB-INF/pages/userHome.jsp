@@ -52,7 +52,7 @@
 
 	<div id="page_body">
 		<jsp:include page="contentBar.jsp"></jsp:include>
-
+	
 		<%
 		switch (requestingPageType) {
 			case "myAccounts" : {

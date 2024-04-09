@@ -4,6 +4,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import com.cache.CustomerLRUCache;
+
 import daos.CustomerDaoInterface;
 import enums.UserStatus;
 import enums.UserType;
@@ -49,11 +51,18 @@ public class CustomerHelper {
 	
 	//read
 	public Customer getCustomer(int customerId) throws CustomBankException{
+		CustomerLRUCache customerCache = new CustomerLRUCache();
+		Customer myCustomer;
+		if((myCustomer = (Customer)customerCache.get(customerId)) != null) {
+			return myCustomer;
+		}
 		Customer dummyCustomer = new Customer();
 		dummyCustomer.setId(customerId);
 		Map<Integer, Customer> customerMap =  customerDao.getCustomers(dummyCustomer, 1, 0);
 		Validators.checkNull(customerMap, "Customer Not found!");
-		return customerMap.get(customerId);
+		myCustomer = customerMap.get(customerId);
+		customerCache.set(customerId,myCustomer);
+		return myCustomer;
 	}
 	
 	public Customer getCustomerFromAadhar(String aadhar) throws CustomBankException{
@@ -100,6 +109,8 @@ public class CustomerHelper {
 	//update
 	public boolean updateCustomer(Customer customer, int customerId) throws CustomBankException{
 		Validators.checkNull(customer);
+		CustomerLRUCache customerCache = new CustomerLRUCache();
+		customerCache.remove(customerId);
 		return customerDao.updateCustomer(customer, customerId);
 	}
 

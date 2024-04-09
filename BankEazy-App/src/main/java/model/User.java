@@ -15,6 +15,20 @@ public class User {
 	private Long dob;
 	private Integer type;		//1 -> Employee, 0 -> Customer
 	private Integer status;		//1 -> Active, 0 -> Inactive
+	private Long lastModifiedOn;
+	private Integer lastModifiedBy;
+	public Long getLastModifiedOn() {
+		return lastModifiedOn;
+	}
+	public void setLastModifiedOn(Long lastModifiedOn) {
+		this.lastModifiedOn = lastModifiedOn;
+	}
+	public Integer getLastModifiedBy() {
+		return lastModifiedBy;
+	}
+	public void setLastModifiedBy(Integer lastModifiedBy) {
+		this.lastModifiedBy = lastModifiedBy;
+	}
 	public Integer getId() {
 		return id;
 	}

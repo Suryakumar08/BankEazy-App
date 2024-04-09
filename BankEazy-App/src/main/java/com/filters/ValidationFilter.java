@@ -9,11 +9,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import exception.CustomBankException;
-import helpers.UserHelper;
-import utilities.Sha_256;
 import utilities.Utilities;
 import utilities.Validators;
 
@@ -31,37 +28,7 @@ public class ValidationFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest)req;
 		String path = request.getRequestURI().substring(request.getContextPath().length());
 		System.out.println("Debugging :: Request Path from Validation filter : " + path);
-		
 		switch(path) {
-		case "/user/changePassword":
-		case "/admin/changePassword":
-		case "/employee/changePassword":{
-			try {
-			if(request.getParameter("currPassword") != null) {
-				UserHelper userHelper = new UserHelper();
-				HttpSession session = request.getSession(false);
-				String currPassword = request.getParameter("currPassword");
-				String existingPassword = userHelper.getPassword((int) session.getAttribute("userId"));
-				if (!Sha_256.getHashedPassword(currPassword).equals(existingPassword)) {
-					request.setAttribute("failure-info", "Incorrect password!");
-					request.getRequestDispatcher("/WEB-INF/pages/changePassword.jsp").forward(request, response);
-					break;
-				}
-				String newPassword = request.getParameter("newPassword");
-				Validators.validatePassword(newPassword);
-				String confirmPassword = request.getParameter("confirmPassword");
-				if (!newPassword.equals(confirmPassword)) {
-					request.setAttribute("failure-info", "Password mismatch occurred!");
-					request.getRequestDispatcher("/WEB-INF/pages/changePassword.jsp").forward(request, response);
-					break;
-				}
-			}
-			}catch(CustomBankException ex) {
-				request.setAttribute("failure-info", ex.getMessage());
-				request.getRequestDispatcher("/WEB-INF/pages/changePassword.jsp").forward(request, response);
-			}
-			break;
-		}
 		case "/admin/addCustomer":
 		case "/employee/addCustomer":{
 			String newUserName = request.getParameter("newUserName");
@@ -119,6 +86,7 @@ public class ValidationFilter implements Filter {
 				if (selectedAccountString == null || selectedAccountString.equals("")) {
 					throw new CustomBankException("Please select Account!");
 				}
+				Validators.validateIsLong(selectedAccountString, "Invalid account number!");
 				if (fromDateString == null || toDateString == null) {
 					throw new CustomBankException("Date not selected!");
 				}
@@ -136,6 +104,7 @@ public class ValidationFilter implements Filter {
 				if (viewUserId == null || viewUserId.equals("")) {
 					throw new CustomBankException("");
 				}
+				
 			}catch(CustomBankException ex) {
 				request.setAttribute("failure-message", ex.getMessage());
 				request.setAttribute("page_type", "manage-user");
@@ -172,6 +141,9 @@ public class ValidationFilter implements Filter {
 				if (accountNumberString.equals("")) {
 					throw new CustomBankException("");
 				}
+				if(accountNumberString.length() != 16) {
+					throw new CustomBankException("Invalid Account Number!");
+				}
 			}catch(CustomBankException ex) {
 				request.setAttribute("failure-message", ex.getMessage());
 				if (path.startsWith("/admin")) {
@@ -184,8 +156,7 @@ public class ValidationFilter implements Filter {
 		}
 			
 		}
-		
-		request.getRequestDispatcher("/pages" + path).forward(request, response);
+		request.getRequestDispatcher("/pages" + path).forward(request, response);			
 	}
 
 	public void init(FilterConfig fConfig) throws ServletException {

@@ -18,6 +18,14 @@ public class Validators {
 		}
 	}
 	
+	public static void validatePassword(String password, String message) throws CustomBankException{
+		validateInput(password);
+		if(!Pattern.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[<>@#$%^&+=!]).{8,}$", password)) {
+			throw new CustomBankException(message);
+		}
+	}
+	
+	
 	public static void validatePassword(String password) throws CustomBankException{
 		validateInput(password);
 		if(!Pattern.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[<>@#$%^&+=!]).{8,}$", password)) {
@@ -77,6 +85,23 @@ public class Validators {
 	    if (pan == null || !pan.matches("[A-Z]{5}[0-9]{4}[A-Z]{1}")) {
 	        throw new CustomBankException("Invalid PAN number! PAN number should have the format: ABCDE1234F");
 	    }
+	}
+
+	public static void validateIsLong(String string, String message) throws CustomBankException{
+		try {
+			Long.parseLong(string);
+		}catch(Exception ex) {
+			throw new CustomBankException(message);
+		}
+	}
+	
+	public static void validateIsInteger(String number, String message) throws CustomBankException{
+		try {
+			Integer.parseInt(number);
+		}
+		catch(Exception ex) {
+			throw new CustomBankException(message);
+		}
 	}
 	
 }
