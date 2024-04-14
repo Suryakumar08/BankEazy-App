@@ -7,6 +7,22 @@
 	<welcome-file-list>
 		<welcome-file>/BankEazy-App/static/index.jsp</welcome-file>
 	</welcome-file-list>
+	<filter>
+		<filter-name>apiFilter</filter-name>
+		<filter-class>com.filters.ApiFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>apiFilter</filter-name>
+		<url-pattern>/api/*</url-pattern>
+	</filter-mapping>
+	<servlet>
+		<servlet-name>apiController</servlet-name>
+		<servlet-class>com.controllers.ApiController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>apiController</servlet-name>
+		<url-pattern>/api/*</url-pattern>
+	</servlet-mapping>
 	<servlet>
 		<servlet-name>controller</servlet-name>
 		<servlet-class>com.controllers.MainController</servlet-class>

@@ -22,6 +22,8 @@ public class CustomerLRUCache implements ICache{
 		customerCache.put((int)key, (Customer)obj);
 	}
 
+	
+	
 	@Override
 	public <K> void remove(K key) {
 		customerCache.remove((int)key);
