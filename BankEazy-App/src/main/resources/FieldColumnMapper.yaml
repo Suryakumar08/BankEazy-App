@@ -56,3 +56,10 @@ User:
  status: Status
  lastModifiedOn: lastModifiedOn
  lastModifiedBy: lastModifiedBy
+ApiData:
+ Class: ApiData
+ apiKey: apiKey
+ userId: userId
+ validity: validity
+ createdAt: createdAt
+ scope: scope

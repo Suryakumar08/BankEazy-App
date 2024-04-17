@@ -19,6 +19,7 @@ import enums.UserStatus;
 import enums.UserType;
 import exception.CustomBankException;
 import helpers.AccountHelper;
+import helpers.ApiHelper;
 import helpers.AuditHelper;
 import helpers.BranchHelper;
 import helpers.CustomerHelper;
@@ -26,6 +27,7 @@ import helpers.EmployeeHelper;
 import helpers.TransactionHelper;
 import helpers.UserHelper;
 import model.Account;
+import model.ApiData;
 import model.Audit;
 import model.Branch;
 import model.Customer;
@@ -84,7 +86,6 @@ public class MainController extends HttpServlet {
 			} catch (CustomBankException ex) {
 				audit.setStatus("failure");
 				audit.setDescription("Login failed!");
-				ex.printStackTrace();
 				request.setAttribute("warning", ex.getMessage());
 				request.getRequestDispatcher("/pages/login").forward(request, response);
 			}
@@ -1410,6 +1411,67 @@ public class MainController extends HttpServlet {
 			}
 			break;
 		}
+		
+		case "/pages/admin/manage-apis":
+		case "/pages/employee/manage-apis":{
+			HttpSession session = request.getSession();
+			int userId = (int)session.getAttribute("userId");
+			request.setAttribute("page_type", "manage-apis");
+			request.setAttribute("page_name", "apiPage");
+			ApiHelper apiHelper = new ApiHelper();
+			try {
+			List<ApiData> datas = apiHelper.getUserApiList(userId);
+			request.setAttribute("apiDatas", datas);
+			}catch (CustomBankException e) {
+				request.setAttribute("api-failure", e.getMessage());
+			}
+			request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
+			break;
+		}
+		
+		case "/pages/admin/addReadApi":
+		case "/pages/employee/addReadApi":{
+			HttpSession session = request.getSession();
+			int userId = (int)session.getAttribute("userId");
+			ApiHelper apiHelper = new ApiHelper();
+			apiHelper.addReadApi(userId);
+			if(path.equals("/pages/employee/addReadApi")) {
+				request.getRequestDispatcher("/pages/employee/manage-apis").forward(request, response);
+			}
+			else {
+				request.getRequestDispatcher("/pages/admin/manage-apis").forward(request, response);
+			}
+			break;
+		}
+		
+		case "/pages/employee/addWriteApi":
+		case "/pages/admin/addWriteApi":{
+			HttpSession session = request.getSession();
+			int userId = (int)session.getAttribute("userId");
+			ApiHelper apiHelper = new ApiHelper();
+			apiHelper.addWriteApi(userId);
+			if(path.equals("/pages/employee/addWriteApi")) {
+				request.getRequestDispatcher("/pages/employee/manage-apis").forward(request, response);
+			}
+			else {
+				request.getRequestDispatcher("/pages/admin/manage-apis").forward(request, response);
+			}
+			break;
+		}
+		
+		case "/pages/employee/removeApiKey":
+		case "/pages/admin/removeApiKey":{
+			String apiKey = request.getParameter("apiKey");
+			ApiHelper apiHelper = new ApiHelper();
+			apiHelper.removeApiKey(apiKey);
+			if(path.equals("/pages/employee/removeApiKey")) {
+				request.getRequestDispatcher("/pages/employee/manage-apis").forward(request, response);
+			}
+			else {
+				request.getRequestDispatcher("/pages/admin/manage-apis").forward(request, response);
+			}
+			break;
+		}
 
 		case "/pages/user/logout":
 		case "/pages/employee/logout":
@@ -1436,7 +1498,7 @@ public class MainController extends HttpServlet {
 					ex.printStackTrace();
 				}
 			}
-			response.sendRedirect("/BankEazy-App");
+			response.sendRedirect("/");
 			break;
 		}
 		default: {

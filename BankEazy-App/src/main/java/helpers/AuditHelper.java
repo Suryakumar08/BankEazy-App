@@ -1,9 +1,9 @@
 package helpers;
 
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import daos.AuditDAO;
 import daos.AuditDaoInterface;
@@ -13,14 +13,14 @@ import utilities.Validators;
 
 public class AuditHelper {
 	
-	private static BlockingQueue<Audit> audits = new LinkedBlockingQueue<>();
 	private static ExecutorService auditExecutor = null;
 	private static AuditDaoInterface auditDao = new AuditDAO();
 	
 	public AuditHelper() {
 		if(auditExecutor == null) {
-			auditExecutor = Executors.newCachedThreadPool();
-			initConsumer();			
+			auditExecutor = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                    60L, TimeUnit.SECONDS,
+                    new LinkedBlockingQueue<Runnable>());
 		}
 	}
 
@@ -38,28 +38,21 @@ public class AuditHelper {
 //		}
 //	}
 	
-	public void initConsumer() {
-		System.out.println("!!!!!!!!!!!initConsumer before Executor : " + Thread.currentThread().getName());
-		auditExecutor.execute(()->{
-			System.out.println("############initConsumer in Executor : " + Thread.currentThread().getName());
-			while(true) {
-				Audit currAudit;
-				try {
-					currAudit = audits.take();
-					auditDao.addAudit(currAudit);
-				} catch (InterruptedException | CustomBankException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 	
 	public void insertAudit(Audit audit) throws CustomBankException{
-		System.out.println("$$$$$$$$$$$$InsertAudit before producer : " + Thread.currentThread().getName());
 		Validators.checkNull(audit, "Empty Audit!");
-		auditExecutor.execute(()->{
-			audits.add(audit);
-			System.out.println("%%%%%%%%%%%%%%%InsertAudit in executor : " + Thread.currentThread().getName());
-		});
+		auditExecutor.execute(addTask(audit));
+	}
+
+	private Runnable addTask(Audit audit) {
+		return new Runnable() {
+			@Override
+			public void run() {
+				try {
+					auditDao.addAudit(audit);
+				} catch (CustomBankException e) {
+				}
+			}
+		};
 	}
 }

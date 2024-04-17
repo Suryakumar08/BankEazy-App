@@ -218,6 +218,8 @@
 .add-account-form {
 	width: 450px;
 	display: flex;
+	
+	
 	gap: 30px;
 	flex-direction: column;
 	justify-content: center;
@@ -338,4 +340,82 @@
 	border-radius: 10px;
 }
 
+#api-body{
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
 
+#api-body-head{
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 20px;
+}
+
+#addApiForm{
+	height: 100px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap : 40px;
+	margin-right: 50px;
+}
+
+#addApiForm button{
+	width :10rem;
+	font-size: 20px;
+	padding: 10px;
+}
+
+#addApiForm button:hover{
+	background-color: darkBlue;
+	color: white;
+	cursor: pointer;
+}
+
+#api-body-body{
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	overflow: scroll;  
+}
+
+#api-table{
+	width: 100%;
+	border-collapse: collapse;
+}
+
+#individual-api-data{
+	color: black;
+	font-size: 20px;
+	height : 40px;
+	padding : 10px;
+	width: 90%;
+}
+
+#individual-api-data td{
+	border: 2px solid gray;
+	text-align: center;
+	background-color: rgb(42, 116, 164, 0.3);
+	padding: 20px;
+}
+
+#individual-api-data td button{
+	width:8rem;
+	height: 3rem;
+	border-radius: 10px;
+	font-size: 16px;
+}
+
+#individual-api-data td button:hover{
+	cursor: pointer;
+	background-color: darkblue;
+	color: white;
+}
+
+.api-table-heads{
+	background-color: rgb(42, 116, 164, 0.7);
+}

@@ -1,15 +1,21 @@
 package com.filters;
 
 import java.io.IOException;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONObject;
+
+import exception.CustomBankException;
+import helpers.ApiHelper;
+import model.ApiData;
 
 
 public class ApiFilter implements Filter {
@@ -29,11 +35,47 @@ public class ApiFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest)request;
 		HttpServletResponse res = (HttpServletResponse)response;
 		String path = req.getPathInfo();
+		System.out.println("Api Filter Path : " + path);
 		
-		if(req.getHeader("Authentication") == null) {
-			response.getWriter().print("Authentication failed!");
+		String apiKey = req.getHeader("Authentication");
+		String requestMethod = req.getMethod();
+		JSONObject failureJson = new JSONObject();
+		if(apiKey == null) {
+			failureJson.put("response-code", 401);
+			failureJson.put("reason", "Authentication key not found!");
+			response.getWriter().print(failureJson);
 		}
-		chain.doFilter(request, response);
+		else {
+			ApiHelper helper = new ApiHelper();
+			ApiData apiData = null;
+			try {
+				apiData = helper.getApi(apiKey);
+				if((apiData == null)) {
+					failureJson.put("response-code", 401);
+					failureJson.put("reason", "Authentication key invalid!");
+					response.getWriter().print(failureJson);
+				}
+				else if((apiData.getCreatedAt() + (apiData.getValidity() * 86400000l)) < System.currentTimeMillis()) {
+					failureJson.put("response-code", 401);
+					failureJson.put("reason", "Authentication key expired!");
+					helper.removeApiKey(apiKey);
+					response.getWriter().print(failureJson);
+				}
+				else if(apiData.getScope() == 1 && requestMethod.equals("POST")) {
+					failureJson.put("response-code", 401);
+					failureJson.put("reason", "Unauthorized token!");
+					response.getWriter().print(failureJson);
+				}
+				else {
+					chain.doFilter(request, response);				
+				}
+			}catch(CustomBankException ex) {
+				ex.printStackTrace();
+				failureJson.put("response-code", 500);
+				failureJson.put("reason", "Internal Server Error!");
+				response.getWriter().print(failureJson);
+			}
+		}
 	}
 
 

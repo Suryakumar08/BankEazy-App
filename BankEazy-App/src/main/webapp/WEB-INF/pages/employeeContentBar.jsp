@@ -11,8 +11,8 @@
 	<div id="contentBar">
 		<ul id="contentList">
 			<%
-			 String requestingPageType = (String)request.getAttribute("page_type");
-			
+			String requestingPageType = (String) request.getAttribute("page_type");
+
 			switch (requestingPageType) {
 			case "manage-user": {
 			%>
@@ -25,7 +25,7 @@
 			<%
 			break;
 			}
-			case "manage-accounts":{
+			case "manage-accounts": {
 			%>
 			<li id="add-account"
 				class="contentList_item ${page_name eq 'addAccount' ? 'selected' : ''}"><a
@@ -36,7 +36,7 @@
 			<%
 			break;
 			}
-			case "manage-transactions":{
+			case "manage-transactions": {
 			%>
 			<li id="deposit"
 				class="contentList_item ${page_name eq 'deposit' ? 'selected' : ''}"><a
@@ -49,7 +49,16 @@
 				href="transactionHistory">Transaction History</a></li>
 			<%
 			break;
-			}}
+			}
+			case "manage-apis": {
+			%>
+			<li
+				class="contentList_item ${page_name eq 'apiPage' ? 'selected' : '' }"><a
+				href="manage-apis">Api Keys</a></li>
+			<%
+			break;
+			}
+			}
 			%>
 		</ul>
 	</div>

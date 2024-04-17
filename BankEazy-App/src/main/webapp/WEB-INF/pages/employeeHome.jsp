@@ -41,66 +41,83 @@
 			alt="BankEazy Logo">
 	</div>
 	<%
-	String requestingPageType = (String)request.getAttribute("page_type");
-	String currPage = (String)request.getAttribute("page_name");%>
+	String requestingPageType = (String) request.getAttribute("page_type");
+	String currPage = (String) request.getAttribute("page_name");
+	%>
 	<jsp:include page="employeeNav.jsp"></jsp:include>
 	<div id="page_body">
 		<jsp:include page="employeeContentBar.jsp"></jsp:include>
 
 
-		<%if(request.getAttribute("warning") != null){ %>
-			<div style="display: flex; align-items: center; justify-content: center;">
-				<span style="color: red; font-size: 20px;"><%=(String)request.getAttribute("warning") %></span>
-			</div>
+		<%
+		if (request.getAttribute("warning") != null) {
+		%>
+		<div
+			style="display: flex; align-items: center; justify-content: center;">
+			<span style="color: red; font-size: 20px;"><%=(String) request.getAttribute("warning")%></span>
+		</div>
 
-		<%}else{
-			
-			switch(currPage){ 
-	case "addUser":{
-	%>
+		<%
+		} else {
+
+		switch (currPage) {
+			case "addUser" : {
+		%>
 		<jsp:include page="addUserPage.jsp"></jsp:include>
 		<%
-	break;
+		break;
 		}
-	case "viewUser":{
+		case "viewUser" : {
 		%>
 		<jsp:include page="viewUserPage.jsp"></jsp:include>
 		<%
 		break;
-	}
-	case "addAccount":{%>
+		}
+		case "addAccount" : {
+		%>
 		<jsp:include page="addAccountPage.jsp"></jsp:include>
 		<%
 		break;
 		}
-	case "viewAccount":{%>
-	<jsp:include page="viewAccountPage.jsp"></jsp:include>
-	<%
-	break;
-	}
-	case "deposit":{
+		case "viewAccount" : {
 		%>
-		<jsp:include page="customerDeposit.jsp"></jsp:include>
-		
+		<jsp:include page="viewAccountPage.jsp"></jsp:include>
 		<%
 		break;
-	}
-	case "withdraw":{
+		}
+		case "deposit" : {
+		%>
+		<jsp:include page="customerDeposit.jsp"></jsp:include>
+
+		<%
+		break;
+		}
+		case "withdraw" : {
 		%>
 		<jsp:include page="customerWithdraw.jsp"></jsp:include>
 		<%
 		break;
-	}
-	case "transactionHistory":{
-	%>
-	<jsp:include page="customerTransactionHistory.jsp"></jsp:include>
-	<script>
-	<%@ include file="/scripts/historyScript.js" %>
-	</script>
-	<%
-	break;
-			}
-			}} %>
+		}
+		case "transactionHistory" : {
+		%>
+		<jsp:include page="customerTransactionHistory.jsp"></jsp:include>
+		<script>
+			
+		<%@ include file="/scripts/historyScript.js" %>
+			
+		</script>
+		<%
+		break;
+		}
+		case "apiPage": {
+		%>
+		<jsp:include page="apiPage.jsp"></jsp:include>
+		<%
+		break;
+		}
+		}
+		}
+		%>
 	</div>
 
 </body>

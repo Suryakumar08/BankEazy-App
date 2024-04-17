@@ -17,6 +17,7 @@
 		<%} %>
 		<a class="nav-item ${page_type eq 'manage-accounts' ? 'selected' : '' }" href="manage-accounts">Accounts</a>
 		<a class="nav-item ${page_type eq 'manage-transactions' ? 'selected' : '' }" href="manage-transactions">Transactions</a>
+		<a class="nav-item" ${page_type eq 'manage-apis' ? 'selected' : '' } href="manage-apis">Api's</a>
 		<a class="nav-item" href="about">About</a>
 		<div class="dropdown">
 			<button class="dropbtn" onclick="toggleDropDownContent()">

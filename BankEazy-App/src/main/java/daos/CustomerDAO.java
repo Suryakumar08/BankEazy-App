@@ -90,7 +90,6 @@ public class CustomerDAO implements CustomerDaoInterface {
 		StringBuilder query = new StringBuilder(getCustomerQuery);
 		daoHelper.addWhereConditions(query, customer);
 		query.append(" limit ? offset ?");
-		System.out.println("Get Customer query : " + query);
 		try (Connection connection = JDBCConnector.getConnection(dbName)) {
 			try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
 				int indexToAdd = daoHelper.setFields(statement, customer);
