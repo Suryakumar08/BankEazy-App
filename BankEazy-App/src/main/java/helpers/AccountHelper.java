@@ -7,7 +7,8 @@ import java.util.Map;
 
 import org.json.JSONObject;
 
-import com.cache.AccountLRUCache;
+import com.cache.ICache;
+import com.dynamicManager.DynamicManager;
 
 import daos.AccountDaoInterface;
 import enums.AccountStatus;
@@ -18,56 +19,67 @@ import utilities.Validators;
 
 public class AccountHelper {
 
-	private AccountDaoInterface accountDao = null;
+	private static AccountDaoInterface accountDao = null;
+	private static ICache<Long, Account> accountCache = null;
 
+	@SuppressWarnings("unchecked")
 	public AccountHelper() throws CustomBankException {
 		Class<?> AccountDAO;
 		Constructor<?> accDao;
 
+		Class<?> AccountCacheClass;
+		Constructor<?> accountCacheConstructor;
 		try {
-			AccountDAO = Class.forName("daos.AccountDAO");
-			accDao = AccountDAO.getDeclaredConstructor();
-			accountDao = (AccountDaoInterface) accDao.newInstance();
+			if (accountDao == null) {
+				AccountDAO = Class.forName("daos.AccountDAO");
+				accDao = AccountDAO.getDeclaredConstructor();
+				accountDao = (AccountDaoInterface) accDao.newInstance();
+			}
+
+			if(accountCache == null) {
+				AccountCacheClass = Class.forName(DynamicManager.getAccountCachePath());
+				accountCacheConstructor = AccountCacheClass.getDeclaredConstructor(int.class);
+				accountCache = (ICache<Long, Account>) accountCacheConstructor.newInstance(50);				
+			}
+
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
 				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			e.printStackTrace();
 			throw new CustomBankException(CustomBankException.ERROR_OCCURRED, e);
 		}
 	}
 
-	//create
+	// create
 	public long addAccount(Account account) throws CustomBankException {
 		Validators.checkNull(account);
 		return accountDao.addAccount(account);
 	}
 
-	//read
+	// read
 	public Map<Long, Account> getAccounts(int customerId) throws CustomBankException {
 		Account dummyAccount = new Account();
 		dummyAccount.setCustomerId(customerId);
-		Map<Long, Account> accountMap = accountDao.getAccounts(dummyAccount,10,0);
+		Map<Long, Account> accountMap = accountDao.getAccounts(dummyAccount, 10, 0);
 		return accountMap;
 	}
-	
+
 	public Map<Long, Account> getAccounts(Account account) throws CustomBankException {
 		Validators.checkNull(account);
-		Map<Long, Account> accountMap = accountDao.getAccounts(account,20,0);
+		Map<Long, Account> accountMap = accountDao.getAccounts(account, 20, 0);
 		return accountMap;
 	}
-	
 
 	public Account getAccount(long accountNo) throws CustomBankException {
-		AccountLRUCache accountCache = new AccountLRUCache();
 		Account resultAccount;
-		if((resultAccount = accountCache.get(accountNo)) != null) {
+		if ((resultAccount = accountCache.get(accountNo)) != null) {
 			return resultAccount;
 		}
 		Account dummyAccount = new Account();
 		dummyAccount.setAccountNo(accountNo);
 		Map<Long, Account> accountMap = accountDao.getAccounts(dummyAccount, 1, 0);
-		try{
+		try {
 			Validators.checkNull(accountMap);
-		}
-		catch(CustomBankException ex) {
+		} catch (CustomBankException ex) {
 			throw new CustomBankException("Account not found!");
 		}
 		resultAccount = accountMap.get(accountNo);
@@ -75,14 +87,13 @@ public class AccountHelper {
 		return resultAccount;
 	}
 
-	
-	public Map<Integer, Map<Long,Account>> getCustomersAccounts() throws CustomBankException{
+	public Map<Integer, Map<Long, Account>> getCustomersAccounts() throws CustomBankException {
 		Map<Integer, Map<Long, Account>> customersAccounts = new HashMap<>();
-		for(Map.Entry<Long, Account> element : getAccounts(new Account()).entrySet()) {
+		for (Map.Entry<Long, Account> element : getAccounts(new Account()).entrySet()) {
 			Account currAccount = element.getValue();
 			int currCustomerId = currAccount.getCustomerId();
 			Map<Long, Account> custAccounts = customersAccounts.get(currCustomerId);
-			if(custAccounts == null) {
+			if (custAccounts == null) {
 				custAccounts = new HashMap<>();
 				customersAccounts.put(currCustomerId, custAccounts);
 			}
@@ -90,19 +101,19 @@ public class AccountHelper {
 		}
 		return customersAccounts;
 	}
-	
-	public Map<Long, JSONObject> getCustomerAccountsWithBranch(int customerId) throws CustomBankException{
+
+	public Map<Long, JSONObject> getCustomerAccountsWithBranch(int customerId) throws CustomBankException {
 		Validators.checkRangeBound(customerId, 1, Integer.MAX_VALUE, "Invalid Customer Id!");
 		Map<Long, JSONObject> accountBranchMap = new HashMap<>();
 		Account dummyAccount = new Account();
 		dummyAccount.setCustomerId(customerId);
 		Map<Long, Account> accountMap = getAccounts(dummyAccount);
-		if(accountMap == null) {
+		if (accountMap == null) {
 			return null;
 		}
 		BranchHelper branchHelper = new BranchHelper();
 		Map<Integer, Branch> branchMap = branchHelper.getAllBranches();
-		for(Map.Entry<Long, Account> element : accountMap.entrySet()) {
+		for (Map.Entry<Long, Account> element : accountMap.entrySet()) {
 			Account currAccount = element.getValue();
 			Branch currAccountBranch = branchMap.get(currAccount.getBranchId());
 			JSONObject accountBranchObj = new JSONObject();
@@ -112,14 +123,14 @@ public class AccountHelper {
 		}
 		return accountBranchMap;
 	}
-	
-	public Map<Long, JSONObject> getAccountsWithBranch(Account account) throws CustomBankException{
+
+	public Map<Long, JSONObject> getAccountsWithBranch(Account account) throws CustomBankException {
 		Validators.checkNull(account);
 		Map<Long, JSONObject> accountBranchMap = new HashMap<>();
 		Map<Long, Account> accountMap = getAccounts(account);
 		BranchHelper branchHelper = new BranchHelper();
 		Map<Integer, Branch> branchMap = branchHelper.getAllBranches();
-		for(Map.Entry<Long, Account> element : accountMap.entrySet()) {
+		for (Map.Entry<Long, Account> element : accountMap.entrySet()) {
 			Account currAccount = element.getValue();
 			Branch currAccountBranch = branchMap.get(currAccount.getBranchId());
 			JSONObject accountBranchObj = new JSONObject();
@@ -129,27 +140,26 @@ public class AccountHelper {
 		}
 		return accountBranchMap;
 	}
-	
-	//update
+
+	// update
 	public boolean updateAmount(long accountNo, double amount) throws CustomBankException {
 		Account account = new Account();
 		account.setAccountNo(accountNo);
 		account.setBalance(amount);
 		return updateAccount(account);
 	}
-	
-	public boolean updateAccount(Account account) throws CustomBankException{
+
+	public boolean updateAccount(Account account) throws CustomBankException {
 		Validators.checkNull(account);
 		Validators.checkNull(account.getAccountNo());
-		AccountLRUCache accountCache = new AccountLRUCache();
 		accountCache.remove(account.getAccountNo());
 		return accountDao.updateAccount(account);
 	}
-	
-	
-	public boolean inActivateAccount(long accountNo, long lastModifiedOn, int lastModifiedBy) throws CustomBankException{
+
+	public boolean inActivateAccount(long accountNo, long lastModifiedOn, int lastModifiedBy)
+			throws CustomBankException {
 		Account account = getAccount(accountNo);
-		if(account == null) {
+		if (account == null) {
 			throw new CustomBankException("Account not found!");
 		}
 		int customerId = account.getCustomerId();
@@ -157,35 +167,34 @@ public class AccountHelper {
 		dummy.setCustomerId(customerId);
 		Map<Long, Account> customerAccounts = getAccounts(dummy);
 		boolean hasAnotherActiveAccount = false;
-		for(Account currAccount : customerAccounts.values()) {
-			if(currAccount.getAccountNo() != accountNo) {
-				if(currAccount.getStatus() == AccountStatus.ACTIVE.getStatus()) {
+		for (Account currAccount : customerAccounts.values()) {
+			if (currAccount.getAccountNo() != accountNo) {
+				if (currAccount.getStatus() == AccountStatus.ACTIVE.getStatus()) {
 					hasAnotherActiveAccount = true;
 					break;
 				}
 			}
 		}
 		boolean isUpdated = false;
-		if(account.getStatus() == AccountStatus.ACTIVE.getStatus()) {
+		if (account.getStatus() == AccountStatus.ACTIVE.getStatus()) {
 			account.setStatus(AccountStatus.INACTIVE.getStatus());
 			account.setLastModifiedBy(lastModifiedBy);
 			account.setLastModifiedOn(lastModifiedOn);
-			isUpdated = updateAccount(account);	
-			if(!hasAnotherActiveAccount) {
+			isUpdated = updateAccount(account);
+			if (!hasAnotherActiveAccount) {
 				CustomerHelper customerHelper = new CustomerHelper();
 				customerHelper.inActivateCustomer(customerId);
 			}
 		}
 		return isUpdated;
 	}
-	
-	
-	public boolean activateAccount(long accountNo, long lastModifiedOn, int lastModifiedBy) throws CustomBankException{
+
+	public boolean activateAccount(long accountNo, long lastModifiedOn, int lastModifiedBy) throws CustomBankException {
 		Account account = getAccount(accountNo);
-		if(account == null) {
+		if (account == null) {
 			throw new CustomBankException("Account not found!");
 		}
-		if(account.getStatus() == AccountStatus.ACTIVE.getStatus()) {
+		if (account.getStatus() == AccountStatus.ACTIVE.getStatus()) {
 			return true;
 		}
 		int customerId = account.getCustomerId();
@@ -196,16 +205,12 @@ public class AccountHelper {
 		return updateAccount(account);
 	}
 
-	
-	
-	//checking
-	public boolean isActiveBankAccount(Account account) throws CustomBankException{
-		if(account.getStatus() == AccountStatus.INACTIVE.getStatus()) {
+	// checking
+	public boolean isActiveBankAccount(Account account) throws CustomBankException {
+		if (account.getStatus() == AccountStatus.INACTIVE.getStatus()) {
 			throw new CustomBankException(CustomBankException.ACCOUNT_INACTIVE);
 		}
 		return true;
 	}
-	
-	
-	
+
 }

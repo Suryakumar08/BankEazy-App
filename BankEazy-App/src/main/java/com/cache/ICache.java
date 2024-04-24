@@ -1,10 +1,12 @@
 package com.cache;
 
-public interface ICache {
+import exception.CustomBankException;
+
+public interface ICache<K,V> {
 	
-	<K, V>V get(K id);
+	V get(K key) throws CustomBankException;
 	
-	<K, T>void set(K key, T obj);
+	void set(K key, V value) throws CustomBankException;
 	
-	<K>void remove(K key);
+	void remove(K key) throws CustomBankException;
 }

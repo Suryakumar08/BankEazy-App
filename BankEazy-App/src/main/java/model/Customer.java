@@ -1,6 +1,9 @@
 package model;
 
-public class Customer extends User{
+import java.io.Serializable;
+
+public class Customer extends User implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private Integer userId;
 	private String pan;
 	private String aadhar;

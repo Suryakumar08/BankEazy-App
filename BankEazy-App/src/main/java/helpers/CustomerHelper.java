@@ -4,7 +4,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-import com.cache.CustomerLRUCache;
+import com.cache.ICache;
+import com.dynamicManager.DynamicManager;
 
 import daos.CustomerDaoInterface;
 import enums.UserStatus;
@@ -16,16 +17,29 @@ import utilities.Validators;
 
 public class CustomerHelper {
 
-	private CustomerDaoInterface customerDao;
+	private static CustomerDaoInterface customerDao = null;
+	private static ICache<Integer, Customer> customerCache = null;
 
+	@SuppressWarnings("unchecked")
 	public CustomerHelper() throws CustomBankException {
 		Class<?> CustomerDAO;
 		Constructor<?> custDao;
 
+		
+		Class<?> CustomerCacheClass;
+		Constructor<?> customerCacheConstructor;
 		try {
-			CustomerDAO = Class.forName("daos.CustomerDAO");
-			custDao = CustomerDAO.getDeclaredConstructor();
-			customerDao = (CustomerDaoInterface) custDao.newInstance();
+			if(customerDao == null) {
+				CustomerDAO = Class.forName("daos.CustomerDAO");
+				custDao = CustomerDAO.getDeclaredConstructor();
+				customerDao = (CustomerDaoInterface) custDao.newInstance();				
+			}
+			
+			if(customerCache == null) {
+				CustomerCacheClass = Class.forName(DynamicManager.getCustomerCachePath());
+				customerCacheConstructor = CustomerCacheClass.getDeclaredConstructor(Integer.class);
+				customerCache = (ICache<Integer, Customer>) customerCacheConstructor.newInstance(50);
+			}
 
 		} catch (NoSuchMethodException | SecurityException | ClassNotFoundException | InstantiationException
 				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -51,9 +65,8 @@ public class CustomerHelper {
 	
 	//read
 	public Customer getCustomer(int customerId) throws CustomBankException{
-		CustomerLRUCache customerCache = new CustomerLRUCache();
 		Customer myCustomer;
-		if((myCustomer = (Customer)customerCache.get(customerId)) != null) {
+		if((myCustomer = customerCache.get(customerId)) != null) {
 			return myCustomer;
 		}
 		Customer dummyCustomer = new Customer();
@@ -109,7 +122,6 @@ public class CustomerHelper {
 	//update
 	public boolean updateCustomer(Customer customer, int customerId) throws CustomBankException{
 		Validators.checkNull(customer);
-		CustomerLRUCache customerCache = new CustomerLRUCache();
 		customerCache.remove(customerId);
 		return customerDao.updateCustomer(customer, customerId);
 	}

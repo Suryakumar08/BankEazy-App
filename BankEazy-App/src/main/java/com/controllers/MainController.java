@@ -105,8 +105,9 @@ public class MainController extends HttpServlet {
 				request.setAttribute("page_type", "myAccounts");
 				request.getRequestDispatcher("/WEB-INF/pages/userHome.jsp").forward(request, response);
 			} catch (CustomBankException ex) {
+				ex.printStackTrace();
 				request.setAttribute("warning", ex.getMessage());
-				request.getRequestDispatcher("/login").forward(request, response);
+				request.getRequestDispatcher("/pages/login").forward(request, response);
 			}
 			break;
 		}

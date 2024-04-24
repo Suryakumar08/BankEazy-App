@@ -1,10 +1,13 @@
 package model;
 
+import java.io.Serializable;
+
 import enums.AccountStatus;
 import exception.CustomBankException;
 import utilities.Validators;
 
-public class Account {
+public class Account implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private static final double MIN_BALANCE = 0;
 	private static final double MAX_BALANCE = 999999999;
 	private Long accountNo;
