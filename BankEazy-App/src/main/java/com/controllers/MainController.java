@@ -52,7 +52,7 @@ public class MainController extends HttpServlet {
 		}
 		case "/pages/home": {
 			Audit audit = new Audit();
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			try {
 				System.out.println("Hii from /pages/home in MainController");
 				int userId = Integer.parseInt(request.getParameter("userId"));
@@ -165,7 +165,7 @@ public class MainController extends HttpServlet {
 		case "/pages/employee/changePassword":
 		case "/pages/admin/changePassword": {
 			Audit audit = new Audit();
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			audit.setTime(currentTime);
 			HttpSession session = request.getSession(false);
 			if (request.getParameter("currPassword") == null) {
@@ -247,7 +247,7 @@ public class MainController extends HttpServlet {
 			String selectedAccountString = request.getParameter("selected-account");
 			String amountString = request.getParameter("amount");
 			String passwordString = request.getParameter("password");
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
 			audit.setAction("Withdraw");
@@ -315,7 +315,7 @@ public class MainController extends HttpServlet {
 			String selectedAccountString = request.getParameter("selected-account");
 			String amountString = request.getParameter("amount");
 			String passwordString = request.getParameter("password");
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
@@ -388,7 +388,7 @@ public class MainController extends HttpServlet {
 			String recipientAccountNo = request.getParameter("recipientAccountNo");
 			String recipientIfsc = request.getParameter("recipientIfsc");
 			String description = request.getParameter("description");
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
@@ -481,7 +481,7 @@ public class MainController extends HttpServlet {
 			String passwordString = request.getParameter("password");
 			String recipientAccountNo = request.getParameter("recipientAccountNo");
 			String description = request.getParameter("description");
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
@@ -542,7 +542,7 @@ public class MainController extends HttpServlet {
 		case "/pages/employee/transactionHistory":
 		case "/pages/admin/transactionHistory": {
 			HttpSession session = request.getSession(false);
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int)session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
@@ -625,7 +625,7 @@ public class MainController extends HttpServlet {
 
 		case "/pages/admin/addCustomer":
 		case "/pages/employee/addCustomer": {
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			HttpSession session = request.getSession(false);
 			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
@@ -691,7 +691,7 @@ public class MainController extends HttpServlet {
 			break;
 		}
 		case "/pages/admin/addEmployee": {
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			HttpSession session = request.getSession(false);
 			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
@@ -752,7 +752,7 @@ public class MainController extends HttpServlet {
 		}
 		case "/pages/admin/getUser": {
 			HttpSession session = request.getSession();
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int)session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
@@ -805,7 +805,7 @@ public class MainController extends HttpServlet {
 		}
 		case "/pages/employee/getUser": {
 			HttpSession session = request.getSession();
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int)session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
@@ -857,7 +857,7 @@ public class MainController extends HttpServlet {
 
 		case "/pages/admin/updateUserDetails": {
 			HttpSession session = request.getSession(false);
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int)session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
@@ -887,7 +887,7 @@ public class MainController extends HttpServlet {
 					currCustomer.setStatus(UserStatus.valueOf(currStatus).getStatus());
 					currCustomer.setType(UserType.valueOf(currType).getType());
 					currCustomer.setLastModifiedBy((int)session.getAttribute("userId"));
-					currCustomer.setLastModifiedOn(System.currentTimeMillis());
+					currCustomer.setLastModifiedOn(Utilities.getCurrentTime());
 					currCustomer.setAadhar(currAadhar);
 					currCustomer.setPan(currPan);
 					CustomerHelper helper = new CustomerHelper();
@@ -943,7 +943,7 @@ public class MainController extends HttpServlet {
 		}
 		case "/pages/employee/updateUserDetails": {
 			HttpSession session = request.getSession(false);
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int)session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
@@ -1020,7 +1020,7 @@ public class MainController extends HttpServlet {
 		case "/pages/admin/addAccount":
 		case "/pages/employee/addAccount": {
 			HttpSession session = request.getSession(false);
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int)session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
@@ -1091,7 +1091,7 @@ public class MainController extends HttpServlet {
 		case "/pages/admin/viewAccount":
 		case "/pages/employee/viewAccount": {
 			HttpSession session = request.getSession(false);
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int)session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
@@ -1140,7 +1140,7 @@ public class MainController extends HttpServlet {
 		case "/pages/admin/changeStatus":
 		case "/pages/employee/changeStatus": {
 			HttpSession session = request.getSession(false);
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int)session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
@@ -1167,6 +1167,7 @@ public class MainController extends HttpServlet {
 					request.getRequestDispatcher("/pages/employee/getAccount").forward(request, response);
 				}
 			} catch (CustomBankException ex) {
+				ex.printStackTrace();
 				audit.setStatus("failure");
 				audit.setDescription("Account updation failed! Exception:" + ex.getMessage());
 				request.setAttribute("failure-message", ex.getMessage());
@@ -1222,13 +1223,13 @@ public class MainController extends HttpServlet {
 			String selectedAccountString = request.getParameter("selected-account");
 			String amountString = request.getParameter("amount");
 			String passwordString = request.getParameter("password");
-			int userId = (int)session.getAttribute("userId");
-			long currentTime = System.currentTimeMillis();
 			Audit audit = new Audit();
+			try {
+			int userId = Utilities.getInteger(session.getAttribute("userId"), "userID invalid!");
+			long currentTime = Utilities.getCurrentTime();
 			audit.setTime(currentTime);
 			audit.setAction("Admin Deposit");
 			audit.setUserId(userId);
-			try {
 				if (selectedAccountString == null || selectedAccountString.equals("null")) {
 					throw new CustomBankException("Please enter Account!");
 				} else if (amountString == null) {
@@ -1236,8 +1237,8 @@ public class MainController extends HttpServlet {
 				} else if (passwordString == null) {
 					throw new CustomBankException("Please enter password!");
 				}
-				new UserHelper().checkPassword((int) session.getAttribute("userId"), passwordString);
-				long selectedAccount = Long.parseLong(selectedAccountString);
+				new UserHelper().checkPassword(userId, passwordString);
+				long selectedAccount = Utilities.getLong(selectedAccountString, "Account No invalid!");
 				audit.setTargetId("" + selectedAccount);
 				AccountHelper accountHelper = new AccountHelper();
 				Account account = accountHelper.getAccount(selectedAccount);
@@ -1246,10 +1247,10 @@ public class MainController extends HttpServlet {
 				}
 				double amount = Double.parseDouble(amountString);
 				if (account.getStatus() == AccountStatus.INACTIVE.getStatus()) {
-					accountHelper.activateAccount(selectedAccount, currentTime, (int)session.getAttribute("userId"));
+					accountHelper.activateAccount(selectedAccount, currentTime, userId);
 				}
 				TransactionHelper transactionHelper = new TransactionHelper();
-				transactionHelper.depositAmount(selectedAccount, amount, currentTime, (int)session.getAttribute("userId"));
+				transactionHelper.depositAmount(selectedAccount, amount, currentTime, userId);
 				audit.setStatus("success");
 				audit.setDescription("Admin deposit to account successful!");
 				request.setAttribute("success-info", "Deposit successful!");
@@ -1278,7 +1279,7 @@ public class MainController extends HttpServlet {
 			String selectedAccountString = request.getParameter("selected-account");
 			String amountString = request.getParameter("amount");
 			String passwordString = request.getParameter("password");
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int)session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setAction("Employee depoit to User");
@@ -1356,7 +1357,7 @@ public class MainController extends HttpServlet {
 			String selectedAccountString = request.getParameter("selected-account");
 			String amountString = request.getParameter("amount");
 			String passwordString = request.getParameter("password");
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			int userId = (int)session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setUserId(userId);
@@ -1479,7 +1480,7 @@ public class MainController extends HttpServlet {
 		case "/pages/admin/logout": {
 			HttpSession session = request.getSession(false);
 			Audit audit = new Audit();
-			long currentTime = System.currentTimeMillis();
+			long currentTime = Utilities.getCurrentTime();
 			Object userId = null;
 			if (session != null) {
 				userId = session.getAttribute("userId");

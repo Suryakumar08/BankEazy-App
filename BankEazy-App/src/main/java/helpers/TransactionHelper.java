@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
+import com.lock.Locker;
+
 import daos.TransactionDaoInterface;
 import enums.TransactionStatus;
 import enums.TransactionType;
@@ -43,8 +45,10 @@ public class TransactionHelper {
 	}
 
 	// create
-	public long depositAmount(long accountNo, double amount, long lastModifiedOn, int lastModifiedBy) throws CustomBankException {
-		Validators.checkRangeBound(amount, TransactionHelper.MIN_DEPOSIT, TransactionHelper.MAX_DEPOSIT, "Invalid Deposit Amount!");
+	public long depositAmount(long accountNo, double amount, long lastModifiedOn, int lastModifiedBy)
+			throws CustomBankException {
+		Validators.checkRangeBound(amount, TransactionHelper.MIN_DEPOSIT, TransactionHelper.MAX_DEPOSIT,
+				"Invalid Deposit Amount!");
 		Transaction currTransaction = setSelfTransactionDetails(accountNo, amount);
 		currTransaction.setLastModifiedBy(lastModifiedBy);
 		currTransaction.setLastModifiedOn(lastModifiedOn);
@@ -52,8 +56,10 @@ public class TransactionHelper {
 		return makeBankTransaction(currTransaction, false);
 	}
 
-	public long withdrawAmount(long accountNo, double amount, long lastModifiedOn, int lastModifiedBy) throws CustomBankException {
-		Validators.checkRangeBound(amount, TransactionHelper.MIN_WITHDRAW, TransactionHelper.MAX_WITHDRAW, "Invalid Withdraw Amount!");
+	public long withdrawAmount(long accountNo, double amount, long lastModifiedOn, int lastModifiedBy)
+			throws CustomBankException {
+		Validators.checkRangeBound(amount, TransactionHelper.MIN_WITHDRAW, TransactionHelper.MAX_WITHDRAW,
+				"Invalid Withdraw Amount!");
 		Transaction currTransaction = setSelfTransactionDetails(accountNo, amount);
 		currTransaction.setLastModifiedBy(lastModifiedBy);
 		currTransaction.setLastModifiedOn(lastModifiedOn);
@@ -76,85 +82,99 @@ public class TransactionHelper {
 		Transaction recipientTransaction = null;
 		Account currAccount = null;
 		Validators.checkNull(currTransaction);
-		Validators.checkRangeBound(currTransaction.getAmount(), TransactionHelper.MIN_TRANSACTION_AMOUNT, TransactionHelper.MAX_TRANSACTION_AMOUNT, "Invalid Amount!");
+		Validators.checkRangeBound(currTransaction.getAmount(), TransactionHelper.MIN_TRANSACTION_AMOUNT,
+				TransactionHelper.MAX_TRANSACTION_AMOUNT, "Invalid Amount!");
 
-		double currAmount = currTransaction.getAmount();
 		long currAccountNo = currTransaction.getAccountNo();
 		long transactionAccountNo = currTransaction.getTransactionAccountNo();
-		
-		if(!isInterBank && currTransaction.getType() != TransactionType.DEPOSIT.getType() && currTransaction.getType() != TransactionType.WITHDRAW.getType()) {
-			try {
-			Account receiverAccount = accHelper.getAccount(transactionAccountNo);
-			if(receiverAccount == null) {
-				throw new CustomBankException("Receiver Account not found!");
-			}
-			}catch(CustomBankException ex) {
-				throw new CustomBankException("No Receiver Account Found!");
-			}
-		}
 
-		isValidTransaction(currAccountNo, transactionAccountNo);
-
-		currAccount = accHelper.getAccount(currAccountNo);
-		Validators.checkNull(currAccount);
-		accHelper.isActiveBankAccount(currAccount);
-
-		currTransaction.setTime(Utilities.getCurrentTime());
-		currTransaction.setStatusFromEnum(TransactionStatus.SUCCESS);
-
-		double currBalance = currAccount.getBalance();
-
-		long lastTransId = -1;
+		long minLock = Math.min(currAccountNo, transactionAccountNo);
+		long maxLock = Math.min(currAccountNo, transactionAccountNo);
 		long transactionReferenceNo = -1;
-		lastTransId = getLastTransactionId();
-		currTransaction.setTransactionId(lastTransId + 1);
-		
-		if (currTransaction.getType() == TransactionType.WITHDRAW.getType()
-				|| currTransaction.getType() == TransactionType.DEBIT.getType()) {
-			double closingBalance = currBalance - currAmount;
-			if (closingBalance < 0) {
-				throw new CustomBankException(CustomBankException.NOT_ENOUGH_BALANCE);
-			}
-			currTransaction.setAmount(currAmount);
-			currTransaction.setClosingBalance(closingBalance);
+		try {
+			synchronized (Locker.lock("AccountNo" + minLock)) {
+				synchronized (Locker.lock("AccountNo" + maxLock)) {
 
-			if (currTransaction.getType() == TransactionType.DEBIT.getType() && isInterBank == false) {
-				recipientTransaction = getRecipientTransactionDetails(currTransaction);
+					double currAmount = currTransaction.getAmount();
+
+					if (!isInterBank && currTransaction.getType() != TransactionType.DEPOSIT.getType()
+							&& currTransaction.getType() != TransactionType.WITHDRAW.getType()) {
+						try {
+							Account receiverAccount = accHelper.getAccount(transactionAccountNo);
+							if (receiverAccount == null) {
+								throw new CustomBankException("Receiver Account not found!");
+							}
+						} catch (CustomBankException ex) {
+							throw new CustomBankException("No Receiver Account Found!");
+						}
+					}
+
+					isValidTransaction(currAccountNo, transactionAccountNo);
+
+					currAccount = accHelper.getAccount(currAccountNo);
+					Validators.checkNull(currAccount);
+					accHelper.isActiveBankAccount(currAccount);
+
+					currTransaction.setTime(Utilities.getCurrentTime());
+					currTransaction.setStatusFromEnum(TransactionStatus.SUCCESS);
+
+					double currBalance = currAccount.getBalance();
+
+					long lastTransId = -1;
+					lastTransId = getLastTransactionId();
+					currTransaction.setTransactionId(lastTransId + 1);
+
+					if (currTransaction.getType() == TransactionType.WITHDRAW.getType()
+							|| currTransaction.getType() == TransactionType.DEBIT.getType()) {
+						double closingBalance = currBalance - currAmount;
+						if (closingBalance < 0) {
+							throw new CustomBankException(CustomBankException.NOT_ENOUGH_BALANCE);
+						}
+						currTransaction.setAmount(currAmount);
+						currTransaction.setClosingBalance(closingBalance);
+
+						if (currTransaction.getType() == TransactionType.DEBIT.getType() && isInterBank == false) {
+							recipientTransaction = getRecipientTransactionDetails(currTransaction);
+						}
+
+					} else if (currTransaction.getType() == TransactionType.DEPOSIT.getType()
+							|| currTransaction.getType() == TransactionType.CREDIT.getType()) {
+						double closingBalance = currBalance + currTransaction.getAmount();
+						currTransaction.setClosingBalance(closingBalance);
+					} else {
+						throw new CustomBankException(CustomBankException.INVALID_TRANSACTION);
+					}
+
+					if (recipientTransaction != null) {
+						transactionReferenceNo = transactionDao.addTransactions(currTransaction, recipientTransaction);
+					} else {
+						transactionReferenceNo = transactionDao.addTransactions(currTransaction);
+					}
+				}
+				return transactionReferenceNo;
 			}
-			
-		} else if (currTransaction.getType() == TransactionType.DEPOSIT.getType()
-				|| currTransaction.getType() == TransactionType.CREDIT.getType()) {
-			double closingBalance = currBalance + currTransaction.getAmount();
-			currTransaction.setClosingBalance(closingBalance);
-		} else {
-			throw new CustomBankException(CustomBankException.INVALID_TRANSACTION);
+		} finally {
+			Locker.unLock("AccountNo" + minLock);
+			Locker.unLock("AccountNo" + maxLock);
 		}
-		
-		if(recipientTransaction != null) {
-			transactionReferenceNo = transactionDao.addTransactions(currTransaction, recipientTransaction);
-		}
-		else {
-			transactionReferenceNo = transactionDao.addTransactions(currTransaction);
-		}
-		return transactionReferenceNo;
 
 	}
 
-	private Transaction getRecipientTransactionDetails(Transaction currTransaction)
-			throws CustomBankException {
+	private Transaction getRecipientTransactionDetails(Transaction currTransaction) throws CustomBankException {
 		Transaction recipientTransaction = new Transaction();
 		Account recipientAccount = accHelper.getAccount(currTransaction.getTransactionAccountNo());
 		Validators.checkNull(recipientAccount);
 		accHelper.isActiveBankAccount(recipientAccount);
 
-		recipientTransaction.setAccountNo(currTransaction.getTransactionAccountNo());
+		recipientTransaction.setAccountNo(recipientAccount.getAccountNo());
 		recipientTransaction.setCustomerId(recipientAccount.getCustomerId());
 		recipientTransaction.setTransactionAccountNo(currTransaction.getAccountNo());
 		recipientTransaction.setTransactionId(currTransaction.getTransactionId());
-		recipientTransaction.setAmount(currTransaction.getAmount());
+		recipientTransaction.setAmount(Math.abs(currTransaction.getAmount()));
 		recipientTransaction.setTypeFromEnum(TransactionType.CREDIT);
 		recipientTransaction.setTime(Utilities.getCurrentTime());
 		recipientTransaction.setStatusFromEnum(TransactionStatus.SUCCESS);
+		recipientTransaction.setDescription(currTransaction.getDescription());
 
 		double currBalance = recipientAccount.getBalance();
 		double closingBalance = currBalance + Math.abs(currTransaction.getAmount());
@@ -164,18 +184,18 @@ public class TransactionHelper {
 	}
 
 	// read
-	
-	
-	public int getNoOfTransactions(long accountNo, long from, long to) throws CustomBankException{
+
+	public int getNoOfTransactions(long accountNo, long from, long to) throws CustomBankException {
 		return transactionDao.getNoOfTransactions(accountNo, from, to);
 	}
-	
-	public List<Transaction> getTransactionsList(long accountNo, long from, long to, int limit, long offset) throws CustomBankException{
+
+	public List<Transaction> getTransactionsList(long accountNo, long from, long to, int limit, long offset)
+			throws CustomBankException {
 		Transaction transaction = new Transaction();
 		transaction.setAccountNo(accountNo);
 		return transactionDao.getTransactionsList(transaction, from, to, limit, offset);
 	}
-	
+
 	public Map<Long, Transaction> getAccountTransactions(long accountNo, long from, long to, int limit, long offset)
 			throws CustomBankException {
 		Transaction transaction = new Transaction();

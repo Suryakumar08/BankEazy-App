@@ -12,6 +12,7 @@ import java.util.Map;
 import exception.CustomBankException;
 import jdbc.JDBCConnector;
 import model.Branch;
+import utilities.Utilities;
 import utilities.Validators;
 
 public class BranchDAO implements BranchDaoInterface {
@@ -26,9 +27,9 @@ public class BranchDAO implements BranchDaoInterface {
 		try (Connection connection = JDBCConnector.getConnection(dbName)) {
 			try (PreparedStatement query = connection.prepareStatement(addBranchQuery,
 					Statement.RETURN_GENERATED_KEYS)) {
-				query.setObject(1, branch.getName());
-				query.setObject(2, branch.getAddress());
-				query.setObject(3, branch.getIfsc());
+				query.setObject(1, Utilities.sanitizeString(branch.getName(),"Invalid branch name!"));
+				query.setObject(2, Utilities.sanitizeString(branch.getAddress(),"Invalid Branch address!"));
+				query.setObject(3, Utilities.sanitizeString(branch.getIfsc(),"Invalid Branch IFSC"));
 
 				int noOfRowsAffected = query.executeUpdate();
 

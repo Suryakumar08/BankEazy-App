@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import exception.CustomBankException;
+import utilities.Utilities;
 import utilities.Validators;
 import yamlConvertor.YamlMapper;
 
@@ -126,6 +127,10 @@ public class DAOHelper {
 				try {
 					Object value = getterMethod.invoke(pojo);
 					if (value != null) {
+						if(value instanceof String) {
+							value = Utilities.sanitizeString((String)value, "Invalid Input!");
+							System.out.println("From DaoHelper : " + value);
+						}
 						statement.setObject(parameterIndex++, value);
 					}
 				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException

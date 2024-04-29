@@ -4,6 +4,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import com.lock.Locker;
+
 import daos.EmployeeDaoInterface;
 import enums.UserType;
 import exception.CustomBankException;
@@ -58,7 +60,12 @@ public class EmployeeHelper {
 	//update
 	public boolean updateEmployee(Employee employee, long employeeId) throws CustomBankException{
 		Validators.checkNull(employee);
-		return employeeDao.updateEmployee(employee, employeeId);
+		boolean isUpdated = false;
+		synchronized (Locker.lock("EmployeeId" + employeeId)) {
+			isUpdated =  employeeDao.updateEmployee(employee, employeeId);			
+		}
+		Locker.unLock("EmployeeId" + employeeId);
+		return isUpdated;
 	}
 	
 }

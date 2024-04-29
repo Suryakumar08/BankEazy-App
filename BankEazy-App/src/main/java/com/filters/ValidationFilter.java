@@ -10,6 +10,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import enums.UserType;
 import exception.CustomBankException;
 import utilities.Utilities;
 import utilities.Validators;
@@ -154,7 +155,65 @@ public class ValidationFilter implements Filter {
 			}
 			break;
 		}
-			
+		case "/admin/updateUserDetails":{
+			try {
+				String currName = request.getParameter("name");
+				Validators.checkNull(currName, "UserName Invalid!");
+				String currPhone = request.getParameter("phone");
+				Validators.validateMobile(currPhone);
+				String currGender = request.getParameter("gender");
+				Validators.checkNull(currGender, "Gender Invalid!");
+				String currDob = request.getParameter("dob");
+				Validators.validateDob(Utilities.getLong(currDob, "DOB invalid!"));
+				String currStatus = request.getParameter("status");
+				Validators.checkNull(currStatus, "Status Invalid!");
+				String currType = request.getParameter("type");
+				if(currType.equals(UserType.Customer.toString())) {
+					String currPan = request.getParameter("pan");
+					Validators.validatePan(currPan);
+					String currAadhar = request.getParameter("aadhar");
+					Validators.validateAadhar(currAadhar);
+				}
+				else {
+					String currSalaryString = request.getParameter("salary");
+					Validators.checkRangeBound(Utilities.getInteger(currSalaryString, "Invalid Salary!"), 100000, 1000000, "Salary should be < 1000000 & > 100000");
+					String joiningDateString = request.getParameter("joiningDate");
+					Validators.checkNull(joiningDateString, "Joining Date Invalid!");
+					String currBranchIdString = request.getParameter("branch");
+					Validators.checkNull(currBranchIdString, "Branch Id Invalid!");
+				}
+			}catch(CustomBankException ex) {
+				request.setAttribute("edit-result", ex.getMessage());
+				request.setAttribute("page_type", "manage-user");
+				request.setAttribute("page_name", "viewUser");
+				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
+			}
+			break;
+		}
+		case "/employee/updateUserDetails":{
+			try {
+				String currName = request.getParameter("name");
+				Validators.checkNull(currName, "UserName Invalid!");
+				String currPhone = request.getParameter("phone");
+				Validators.validateMobile(currPhone);
+				String currGender = request.getParameter("gender");
+				Validators.checkNull(currGender, "Gender Invalid!");
+				String currDob = request.getParameter("dob");
+				Validators.validateDob(Utilities.getLong(currDob, "DOB invalid!"));
+				String currStatus = request.getParameter("status");
+				Validators.checkNull(currStatus, "Status Invalid!");
+				String currPan = request.getParameter("pan");
+				Validators.validatePan(currPan);
+				String currAadhar = request.getParameter("aadhar");
+				Validators.validateAadhar(currAadhar);
+			}catch(CustomBankException ex) {
+				request.setAttribute("edit-result", ex.getMessage());
+				request.setAttribute("page_type", "manage-user");
+				request.setAttribute("page_name", "viewUser");
+				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
+			}
+			break;
+		}
 		}
 		request.getRequestDispatcher("/pages" + path).forward(request, response);			
 	}

@@ -12,6 +12,7 @@ import java.util.Map;
 import exception.CustomBankException;
 import jdbc.JDBCConnector;
 import model.Employee;
+import utilities.Utilities;
 import utilities.Validators;
 
 public class EmployeeDAO implements EmployeeDaoInterface {
@@ -33,10 +34,10 @@ public class EmployeeDAO implements EmployeeDaoInterface {
 			try (PreparedStatement statement = connection.prepareStatement(insertUserQuery,
 					Statement.RETURN_GENERATED_KEYS)) {
 
-				statement.setObject(1, employee.getName());
-				statement.setObject(2, employee.getPassword());
-				statement.setObject(3, employee.getMobile());
-				statement.setObject(4, employee.getGender());
+				statement.setObject(1, Utilities.sanitizeString(employee.getName(), "Invalid Name!"));
+				statement.setObject(2, Utilities.sanitizeString(employee.getPassword(), "Invalid Password"));
+				statement.setObject(3, Utilities.sanitizeString(employee.getMobile(), "Invalid Mobile!"));
+				statement.setObject(4, Utilities.sanitizeString(employee.getGender(), "Invalid Gender!"));
 				statement.setObject(5, employee.getDob());
 				statement.setObject(6, employee.getStatus());
 				statement.setObject(7, employee.getType());

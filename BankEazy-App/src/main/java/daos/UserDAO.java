@@ -9,7 +9,6 @@ import java.util.Map;
 
 import exception.CustomBankException;
 import jdbc.JDBCConnector;
-import model.Customer;
 import model.User;
 
 public class UserDAO implements UserDaoInterface {

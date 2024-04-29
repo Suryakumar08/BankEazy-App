@@ -39,7 +39,7 @@ public class AccountHelper {
 			if(accountCache == null) {
 				AccountCacheClass = Class.forName(DynamicManager.getAccountCachePath());
 				accountCacheConstructor = AccountCacheClass.getDeclaredConstructor(int.class);
-				accountCache = (ICache<Long, Account>) accountCacheConstructor.newInstance(50);				
+				accountCache = (ICache<Long, Account>) accountCacheConstructor.newInstance(6379);				
 			}
 
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException

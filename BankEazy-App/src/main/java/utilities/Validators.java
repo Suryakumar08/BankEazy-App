@@ -73,6 +73,11 @@ public class Validators {
 	    if (dobInMillis > minDobInMillis) {
 	        throw new CustomBankException("Invalid date of birth! Age should be at least 18 years.");
 	    }
+        long millisecondsIn70Years = 70L * 365L * 24L * 60L * 60L * 1000L;
+        long time70YearsAgoMillis = currentTimeInMillis - millisecondsIn70Years;
+	    if(dobInMillis < time70YearsAgoMillis) {
+	    	throw new CustomBankException("Age should be below 70 years");
+	    }
 	}
 
 	public static void validateAadhar(String aadhar) throws CustomBankException {

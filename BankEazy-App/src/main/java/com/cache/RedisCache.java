@@ -5,51 +5,57 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Arrays;
 
 import exception.CustomBankException;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
-public class RedisCache<K, V> implements ICache<K, V>{
-	JedisPool pool = new JedisPool("localhost", 6379);
-	Jedis jedis = null;
-	public RedisCache(int capacity) {
-		jedis = pool.getResource();
+public class RedisCache<K, V> implements ICache<K, V> {
+	private static JedisPoolConfig config = new JedisPoolConfig();
+	private static JedisPool pool = null;
+
+	public RedisCache(int port) {
+		config.setMaxTotal(50);
+		config.setMaxIdle(5);
+		pool = new JedisPool(config, "localhost", port);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public V get(K key) throws CustomBankException {
-		byte[] keyBytes = getByteArray(key);
-		byte[] resultArr = jedis.get(keyBytes);
-		System.out.println(Arrays.toString(resultArr));
-		if(resultArr == null) {
-			return null;
-		}
-		else {
-			Object obj = getObjectFromByteArray(resultArr);	
-			System.out.println(obj.getClass());
-			return (V)obj;
+		try (Jedis jedis = pool.getResource()) {
+			byte[] keyBytes = getByteArray(key);
+			byte[] resultArr = jedis.get(keyBytes);
+			if (resultArr == null) {
+				return null;
+			} else {
+				Object obj = getObjectFromByteArray(resultArr);
+				return (V) obj;
+			}
 		}
 	}
 
 	@Override
-	public void set(K key, V value) throws CustomBankException{
-		byte[] keyBytes = getByteArray(key);
-		byte[] valueBytes = getByteArray(value);
-		jedis.set(keyBytes, valueBytes);
+	public void set(K key, V value) throws CustomBankException {
+		try (Jedis jedis = pool.getResource()) {
+			byte[] keyBytes = getByteArray(key);
+			byte[] valueBytes = getByteArray(value);
+			jedis.set(keyBytes, valueBytes);
+		}
 	}
 
 	@Override
 	public void remove(K key) throws CustomBankException {
-		byte[] keyBytes = getByteArray(key);
-		jedis.del(keyBytes);
+		try (Jedis jedis = pool.getResource()) {
+			byte[] keyBytes = getByteArray(key);
+			jedis.del(keyBytes);
+		}
 	}
-	
-	private byte[] getByteArray(Object obj) throws CustomBankException{
-		try(ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				ObjectOutputStream oos = new ObjectOutputStream(baos)){
+
+	private byte[] getByteArray(Object obj) throws CustomBankException {
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ObjectOutputStream oos = new ObjectOutputStream(baos)) {
 			oos.writeObject(obj);
 			return baos.toByteArray();
 		} catch (IOException e) {
@@ -57,10 +63,10 @@ public class RedisCache<K, V> implements ICache<K, V>{
 			throw new CustomBankException("Serialization failed!", e);
 		}
 	}
-	
-	private Object getObjectFromByteArray(byte[] bytes) throws CustomBankException{
-		try(ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-				ObjectInputStream ois = new ObjectInputStream(bais);){
+
+	private Object getObjectFromByteArray(byte[] bytes) throws CustomBankException {
+		try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+				ObjectInputStream ois = new ObjectInputStream(bais);) {
 			return ois.readObject();
 		} catch (IOException | ClassNotFoundException e) {
 			throw new CustomBankException("Deserialization failed!", e);

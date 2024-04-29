@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.cache.ICache;
 import com.dynamicManager.DynamicManager;
+import com.lock.Locker;
 
 import daos.CustomerDaoInterface;
 import enums.UserStatus;
@@ -37,8 +38,8 @@ public class CustomerHelper {
 			
 			if(customerCache == null) {
 				CustomerCacheClass = Class.forName(DynamicManager.getCustomerCachePath());
-				customerCacheConstructor = CustomerCacheClass.getDeclaredConstructor(Integer.class);
-				customerCache = (ICache<Integer, Customer>) customerCacheConstructor.newInstance(50);
+				customerCacheConstructor = CustomerCacheClass.getDeclaredConstructor(int.class);
+				customerCache = (ICache<Integer, Customer>) customerCacheConstructor.newInstance(6379);
 			}
 
 		} catch (NoSuchMethodException | SecurityException | ClassNotFoundException | InstantiationException
@@ -123,7 +124,15 @@ public class CustomerHelper {
 	public boolean updateCustomer(Customer customer, int customerId) throws CustomBankException{
 		Validators.checkNull(customer);
 		customerCache.remove(customerId);
-		return customerDao.updateCustomer(customer, customerId);
+		boolean isUpdated = false;
+		try {			
+			synchronized (Locker.lock("CustomerId" + customerId)) {
+				isUpdated = customerDao.updateCustomer(customer, customerId);
+			}
+			return isUpdated;
+		}finally {
+			Locker.unLock("CustomerId" + customerId);			
+		}
 	}
 
 	public void inActivateCustomer(int customerId) throws CustomBankException{

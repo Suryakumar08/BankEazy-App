@@ -14,6 +14,7 @@ import java.util.Map;
 import exception.CustomBankException;
 import jdbc.JDBCConnector;
 import model.Transaction;
+import utilities.Utilities;
 import utilities.Validators;
 
 public class TransactionDAO implements TransactionDaoInterface {
@@ -43,7 +44,7 @@ public class TransactionDAO implements TransactionDaoInterface {
 					statement.setObject(1, transaction.getCustomerId());
 					statement.setObject(2, transaction.getAccountNo());
 					statement.setObject(3, transaction.getTransactionAccountNo());
-					statement.setObject(4, transaction.getDescription());
+					statement.setObject(4, Utilities.sanitizeString(transaction.getDescription(), "Description is null!"));
 					statement.setObject(5, transaction.getType());
 					statement.setObject(6, transaction.getStatus());
 					statement.setObject(7, transaction.getTime());
@@ -88,6 +89,7 @@ public class TransactionDAO implements TransactionDaoInterface {
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
+			throw new CustomBankException(CustomBankException.TRANSACTION_FAILED, e);
 		} finally {
 			try {
 				connection.setAutoCommit(true);

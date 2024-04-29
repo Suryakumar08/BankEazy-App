@@ -7,6 +7,7 @@ public class LRUCache<K, V> implements ICache<K,V> {
 
 	private Map<K, V> cache = null;
 
+	
 	public LRUCache(int capacity) {
 		cache = new LinkedHashMap<K, V>() {
 			private static final long serialVersionUID = 1L;

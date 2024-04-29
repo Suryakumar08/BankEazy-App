@@ -12,6 +12,7 @@ import java.util.Map;
 import exception.CustomBankException;
 import jdbc.JDBCConnector;
 import model.Customer;
+import utilities.Utilities;
 import utilities.Validators;
 
 public class CustomerDAO implements CustomerDaoInterface {
@@ -32,10 +33,10 @@ public class CustomerDAO implements CustomerDaoInterface {
 			try (PreparedStatement statement = connection.prepareStatement(insertUserQuery,
 					Statement.RETURN_GENERATED_KEYS)) {
 
-				statement.setObject(1, customer.getName());
-				statement.setObject(2, customer.getPassword());
-				statement.setObject(3, customer.getMobile());
-				statement.setObject(4, customer.getGender());
+				statement.setObject(1, Utilities.sanitizeString(customer.getName(), "Invalid Name!"));
+				statement.setObject(2, Utilities.sanitizeString(customer.getPassword(), "Invalid Password"));
+				statement.setObject(3, Utilities.sanitizeString(customer.getMobile(), "Invalid Mobile!"));
+				statement.setObject(4, Utilities.sanitizeString(customer.getGender(), "Invalid Gender!"));
 				statement.setObject(5, customer.getDob());
 				statement.setObject(6, customer.getStatus());
 				statement.setObject(7, customer.getType());

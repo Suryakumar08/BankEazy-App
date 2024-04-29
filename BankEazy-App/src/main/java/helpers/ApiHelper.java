@@ -1,5 +1,6 @@
 package helpers;
 
+import java.security.SecureRandom;
 import java.util.List;
 
 import daos.ApiDAO;
@@ -70,10 +71,11 @@ public class ApiHelper {
 	
 	private String createApi() {
 		String apiChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890&";
+		SecureRandom random = new SecureRandom();
 		StringBuilder apiKey = new StringBuilder();
 		int len = apiChars.length();
 		for(int i = 0; i < 40; i++) {
-			int currRandom = (int)(Math.random() * len);
+			int currRandom = random.nextInt(len);
 			apiKey.append(apiChars.charAt(currRandom));
 		}
 		return apiKey.toString();
