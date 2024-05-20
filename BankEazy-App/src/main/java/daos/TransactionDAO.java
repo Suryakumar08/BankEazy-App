@@ -20,7 +20,7 @@ import utilities.Validators;
 public class TransactionDAO implements TransactionDaoInterface {
 
 	private String dbName = "BankEazy";
-	private String addTransactionQuery = "insert into Transaction(customerId, accountNo, transactionAccountNo, description, type, status, time, closingBalance, transactionId, amount) values(?,?,?,?,?,?,?,?,?,?)";
+	private String addTransactionQuery = "insert into Transaction(customerId, accountNo, transactionAccountNo, description, type, status, time, closingBalance, transactionId, amount, lastModifiedOn, lastModifiedBy) values(?,?,?,?,?,?,?,?,?,?,?,?)";
 	private String lastTransactionIdQuery = "select MAX(transactionId) as maxId from Transaction";
 	private String getTransactionQuery = "select customerId, accountNo, transactionAccountNo, description, type, status, time, closingBalance, transactionId, amount, referenceNo from Transaction";
 	private String updateAmountQuery = "update Account set balance = ?, lastModifiedOn = ?, lastModifiedBy = ? where accountNo = ?";
@@ -51,7 +51,10 @@ public class TransactionDAO implements TransactionDaoInterface {
 					statement.setObject(8, transaction.getClosingBalance());
 					statement.setObject(9, transaction.getTransactionId());
 					statement.setObject(10, transaction.getAmount());
+					statement.setObject(11, transaction.getLastModifiedOn());
+					statement.setObject(12, transaction.getLastModifiedBy());
 
+										
 					int noOfRowsAffected = statement.executeUpdate();
 					if (noOfRowsAffected < 1) {
 						throw new CustomBankException(CustomBankException.TRANSACTION_FAILED);

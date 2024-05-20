@@ -64,6 +64,7 @@ public class Utilities {
 		Long result = null;
 		try {
 			if(obj instanceof String) {
+				System.out.println((String)obj);
 				result = Long.parseLong((String)obj);
 			}
 			else {

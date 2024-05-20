@@ -27,7 +27,7 @@
 <%
 	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");//http 1.1
 	response.setHeader("pragma", "no-cache"); //http 1.0
-	response.setHeader("Expires", "0"); //proxies
+	response.setHeader("Expires", "0"); //com.proxies
 	%>
 	<div class="logo">
 		<img src="<%=request.getContextPath()%>/static/images/logo.png"
@@ -50,6 +50,7 @@
 				<%@ page import="model.User"%>
 				<%@ page import="model.Customer"%>
 				<%@ page import="model.Employee"%>
+				<%@ page import="utilities.Utilities" %>
 				<%
 				User user = (User) request.getAttribute("user");
 				%>
@@ -82,7 +83,7 @@
 							</tr>
 							<tr>
 								<td>DOB</td>
-								<td><strong><%=Utilities.getDateString(user.getDob())%></strong></td>
+								<td><strong><%= Utilities.getDateString(user.getDob()) %></strong></td>
 							</tr>
 							<%
 							if ((int) session.getAttribute("userType") == UserType.Customer.getType()) {

@@ -7,6 +7,8 @@ import java.util.Map;
 import com.cache.ICache;
 import com.dynamicManager.DynamicManager;
 import com.lock.Locker;
+import com.proxies.IDataRetriever;
+import com.proxies.ProxyBuilder;
 
 import daos.CustomerDaoInterface;
 import enums.UserStatus;
@@ -20,6 +22,7 @@ public class CustomerHelper {
 
 	private static CustomerDaoInterface customerDao = null;
 	private static ICache<Integer, Customer> customerCache = null;
+	private static IDataRetriever dataRetriever = null;
 
 	@SuppressWarnings("unchecked")
 	public CustomerHelper() throws CustomBankException {
@@ -41,6 +44,7 @@ public class CustomerHelper {
 				customerCacheConstructor = CustomerCacheClass.getDeclaredConstructor(int.class);
 				customerCache = (ICache<Integer, Customer>) customerCacheConstructor.newInstance(6379);
 			}
+			dataRetriever = ProxyBuilder.createCustomerProxy(customerCache, customerDao);
 
 		} catch (NoSuchMethodException | SecurityException | ClassNotFoundException | InstantiationException
 				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -66,17 +70,20 @@ public class CustomerHelper {
 	
 	//read
 	public Customer getCustomer(int customerId) throws CustomBankException{
-		Customer myCustomer;
-		if((myCustomer = customerCache.get(customerId)) != null) {
-			return myCustomer;
-		}
-		Customer dummyCustomer = new Customer();
-		dummyCustomer.setId(customerId);
-		Map<Integer, Customer> customerMap =  customerDao.getCustomers(dummyCustomer, 1, 0);
-		Validators.checkNull(customerMap, "Customer Not found!");
-		myCustomer = customerMap.get(customerId);
-		customerCache.set(customerId,myCustomer);
-		return myCustomer;
+		
+		return dataRetriever.getCustomer(customerId);
+		 
+//		Customer myCustomer;
+//		if((myCustomer = customerCache.get(customerId)) != null) {
+//			return myCustomer;
+//		}
+//		Customer dummyCustomer = new Customer();
+//		dummyCustomer.setId(customerId);
+//		Map<Integer, Customer> customerMap =  customerDao.getCustomers(dummyCustomer, 1, 0);
+//		Validators.checkNull(customerMap, "Customer Not found!");
+//		myCustomer = customerMap.get(customerId);
+//		customerCache.set(customerId,myCustomer);
+//		return myCustomer;
 	}
 	
 	public Customer getCustomerFromAadhar(String aadhar) throws CustomBankException{
@@ -123,7 +130,9 @@ public class CustomerHelper {
 	//update
 	public boolean updateCustomer(Customer customer, int customerId) throws CustomBankException{
 		Validators.checkNull(customer);
-		customerCache.remove(customerId);
+		try{
+			customerCache.remove(customerId);
+		}catch(CustomBankException e) {}
 		boolean isUpdated = false;
 		try {			
 			synchronized (Locker.lock("CustomerId" + customerId)) {

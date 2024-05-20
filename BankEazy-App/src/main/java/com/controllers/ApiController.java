@@ -16,8 +16,12 @@ import enums.UserType;
 import exception.CustomBankException;
 import helpers.CustomerHelper;
 import helpers.EmployeeHelper;
+import helpers.TransactionHelper;
+import helpers.InterBankProto.InterBank;
 import model.Customer;
 import model.Employee;
+import model.Transaction;
+import utilities.ProtoUtils;
 import utilities.Utilities;
 
 public class ApiController extends HttpServlet {
@@ -109,15 +113,16 @@ public class ApiController extends HttpServlet {
 		if(blocks[1].equals("customer")) {
 			Customer customer = new Customer();
 			
-			StringBuilder requestParams = new StringBuilder();
-			try(BufferedReader reader = request.getReader()){
-				String line;
-				while((line = reader.readLine()) != null) {
-					requestParams.append(line);
-				}
+			
+			String requestParamsString = null;
+			try {
+				requestParamsString = getDataFromReqBody(request);
+			} catch (CustomBankException e) {
+				e.printStackTrace();
 			}
 			
-			JSONObject customerParams = new JSONObject(requestParams.toString());
+			
+			JSONObject customerParams = new JSONObject(requestParamsString);
 			
 			int type = UserType.Customer.getType();
 			String newUserName = customerParams.getString("userName");
@@ -148,6 +153,27 @@ public class ApiController extends HttpServlet {
 				response.getWriter().print(e.getMessage());
 			}
 		}
+		//inter-bank-transfer
+		else if(blocks[1].equals("money-transfer")) {
+			JSONObject responseJSON = new JSONObject();
+			try {
+				String jsonData = getDataFromReqBody(request);
+				JSONObject moneyTransferObject = new JSONObject(jsonData);
+				InterBank data = ProtoUtils.getInterBankProto(moneyTransferObject.getJSONObject("data").getString("inter_bank_data"));
+				TransactionHelper transactionHelper = new TransactionHelper();
+				transactionHelper.creditAmount(data);
+				responseJSON.put("status", "SUCCESS");
+				responseJSON.put("message", "Transaction success!");
+				
+			} catch (CustomBankException e) {
+				e.printStackTrace();
+				responseJSON.put("status", "failure");
+				responseJSON.put("message", e.getMessage());
+			}
+			finally {
+				response.getWriter().print(responseJSON);
+			}
+		}
 	}
 
 	
@@ -157,6 +183,21 @@ public class ApiController extends HttpServlet {
 	
 	
 	
+	private String getDataFromReqBody(HttpServletRequest request) throws CustomBankException{
+		StringBuilder requestParams = new StringBuilder();
+		try(BufferedReader reader = request.getReader()){
+			String line;
+			while((line = reader.readLine()) != null) {
+				requestParams.append(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Parsing failed!");
+			throw new CustomBankException("Server error!", e);
+		}
+		return requestParams.toString();
+	}
+
 	protected JSONObject getCustomerJsonObject(int customerId) {
 		JSONObject customerObj = new JSONObject();
 		Customer currCustomer = null;

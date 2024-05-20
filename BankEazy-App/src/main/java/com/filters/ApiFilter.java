@@ -29,7 +29,7 @@ public class ApiFilter implements Filter {
 	public void destroy() {
 		// TODO Auto-generated method stub
 	}
-
+ 
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest)request;
@@ -38,6 +38,9 @@ public class ApiFilter implements Filter {
 		System.out.println("Api Filter Path : " + path);
 		
 		String apiKey = req.getHeader("Authentication");
+		if(apiKey == null) {
+			apiKey = req.getHeader("secretkey");
+		}
 		String requestMethod = req.getMethod();
 		JSONObject failureJson = new JSONObject();
 		if(apiKey == null) {

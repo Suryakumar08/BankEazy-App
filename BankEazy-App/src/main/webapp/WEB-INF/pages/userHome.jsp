@@ -36,7 +36,7 @@
 	<%
 	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");//http 1.1
 	response.setHeader("pragma", "no-cache"); //http 1.0
-	response.setHeader("Expires", "0"); //proxies
+	response.setHeader("Expires", "0"); //com.proxies
 	%>
 	<div class="logo">
 		<img src="<%=request.getContextPath()%>/static/images/logo.png"

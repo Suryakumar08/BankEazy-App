@@ -10,10 +10,12 @@ import exception.CustomBankException;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import yamlConvertor.YamlMapper;
 
 public class RedisCache<K, V> implements ICache<K, V> {
 	private static JedisPoolConfig config = new JedisPoolConfig();
 	private static JedisPool pool = null;
+	private static YamlMapper mapper = null;
 
 	public RedisCache(int port) {
 		config.setMaxTotal(50);
@@ -24,6 +26,7 @@ public class RedisCache<K, V> implements ICache<K, V> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public V get(K key) throws CustomBankException {
+		checkRedisConf();
 		try (Jedis jedis = pool.getResource()) {
 			byte[] keyBytes = getByteArray(key);
 			byte[] resultArr = jedis.get(keyBytes);
@@ -38,6 +41,7 @@ public class RedisCache<K, V> implements ICache<K, V> {
 
 	@Override
 	public void set(K key, V value) throws CustomBankException {
+		checkRedisConf();
 		try (Jedis jedis = pool.getResource()) {
 			byte[] keyBytes = getByteArray(key);
 			byte[] valueBytes = getByteArray(value);
@@ -47,6 +51,7 @@ public class RedisCache<K, V> implements ICache<K, V> {
 
 	@Override
 	public void remove(K key) throws CustomBankException {
+		checkRedisConf();
 		try (Jedis jedis = pool.getResource()) {
 			byte[] keyBytes = getByteArray(key);
 			jedis.del(keyBytes);
@@ -71,5 +76,18 @@ public class RedisCache<K, V> implements ICache<K, V> {
 		} catch (IOException | ClassNotFoundException e) {
 			throw new CustomBankException("Deserialization failed!", e);
 		}
+	}
+
+	public boolean checkRedisConf() throws CustomBankException{
+		boolean result = false;
+		try {
+			mapper = new YamlMapper();
+			result = mapper.useRedisCache();
+		} catch (CustomBankException e) {
+		}
+		if(result == false) {
+			throw new CustomBankException("Redis Cache usage is blocked as of now!");
+		}
+		return true;
 	}
 }

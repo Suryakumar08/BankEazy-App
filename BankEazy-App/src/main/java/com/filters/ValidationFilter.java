@@ -26,6 +26,7 @@ public class ValidationFilter implements Filter {
 	}
 
 	public void doFilter(ServletRequest req, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+		boolean doDispatch = true;
 		HttpServletRequest request = (HttpServletRequest)req;
 		String path = request.getRequestURI().substring(request.getContextPath().length());
 		System.out.println("Debugging :: Request Path from Validation filter : " + path);
@@ -186,6 +187,7 @@ public class ValidationFilter implements Filter {
 				request.setAttribute("edit-result", ex.getMessage());
 				request.setAttribute("page_type", "manage-user");
 				request.setAttribute("page_name", "viewUser");
+				doDispatch = false;
 				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
 			}
 			break;
@@ -199,7 +201,7 @@ public class ValidationFilter implements Filter {
 				String currGender = request.getParameter("gender");
 				Validators.checkNull(currGender, "Gender Invalid!");
 				String currDob = request.getParameter("dob");
-				Validators.validateDob(Utilities.getLong(currDob, "DOB invalid!"));
+				Validators.validateDob(Utilities.getLong(Utilities.getDateInMillis(currDob), "DOB invalid!"));
 				String currStatus = request.getParameter("status");
 				Validators.checkNull(currStatus, "Status Invalid!");
 				String currPan = request.getParameter("pan");
@@ -207,6 +209,7 @@ public class ValidationFilter implements Filter {
 				String currAadhar = request.getParameter("aadhar");
 				Validators.validateAadhar(currAadhar);
 			}catch(CustomBankException ex) {
+				doDispatch = false;
 				request.setAttribute("edit-result", ex.getMessage());
 				request.setAttribute("page_type", "manage-user");
 				request.setAttribute("page_name", "viewUser");
@@ -215,7 +218,9 @@ public class ValidationFilter implements Filter {
 			break;
 		}
 		}
-		request.getRequestDispatcher("/pages" + path).forward(request, response);			
+		if(doDispatch) {
+			request.getRequestDispatcher("/pages" + path).forward(request, response);			
+		}
 	}
 
 	public void init(FilterConfig fConfig) throws ServletException {

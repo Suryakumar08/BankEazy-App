@@ -14,16 +14,31 @@ public class YamlMapper {
 	private static Map<String, Map<String, String>> classTableMap;
 	private static Map<String, Map<String, Map<String, String>>> fieldColumnMap;
 	private static Map<String, Map<String, String>> mappingMap = null;
+	private static Map<String, Boolean> useRedisMap = null;
+	private static Map<String, Map<String, String>> ifscMap = null;
 
 	static {
 		classTableMap = new HashMap<>();
 		classTableMap.put("classToTable", new HashMap<String, String>());
 		classTableMap.put("tableToClass", new HashMap<String, String>());
 		fieldColumnMap = new HashMap<>();
+		
 	}
 
+	@SuppressWarnings("unchecked")
 	public YamlMapper() throws CustomBankException {
 		setMappings();
+		try {
+			if(useRedisMap == null) {
+				useRedisMap = mapper.readValue(YamlMapper.class.getClassLoader().getResourceAsStream("RedisCacheConfig.yaml"), Map.class);				
+			}
+			if(ifscMap == null) {
+				ifscMap = mapper.readValue(YamlMapper.class.getClassLoader().getResourceAsStream("BankIFSCs.yaml"), Map.class);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new CustomBankException("Redis Cache Config error!", e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -74,4 +89,27 @@ public class YamlMapper {
 	public Map<String, Map<String, Map<String, String>>> getFieldColumnMap() {
 		return fieldColumnMap;
 	}
+	
+	public boolean useRedisCache() throws CustomBankException{
+		return useRedisMap.get("useRedisCache");
+	}
+	
+	public String getBankURL(String ifsc) throws CustomBankException{
+		String ifscFinder = ifsc.substring(0, 4);
+		Map<String, String> bankDetails = ifscMap.get(ifscFinder);
+		if(bankDetails == null) {
+			throw new CustomBankException("No Bank found!");
+		}
+		return bankDetails.get("url");
+	}
+	
+	public String getBankSecretKey(String ifsc) throws CustomBankException{
+		String ifscFinder = ifsc.substring(0, 4);
+		Map<String, String> bankDetails = ifscMap.get(ifscFinder);
+		if(bankDetails == null) {
+			throw new CustomBankException("No Bank found!");
+		}
+		return bankDetails.get("secretkey");
+	}
+	
 }

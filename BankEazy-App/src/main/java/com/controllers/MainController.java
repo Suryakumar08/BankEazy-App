@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import org.json.JSONObject;
 
 import enums.AccountStatus;
+import enums.TransactionStatus;
 import enums.TransactionType;
 import enums.UserStatus;
 import enums.UserType;
@@ -24,6 +26,7 @@ import helpers.AuditHelper;
 import helpers.BranchHelper;
 import helpers.CustomerHelper;
 import helpers.EmployeeHelper;
+import helpers.RequestHelper;
 import helpers.TransactionHelper;
 import helpers.UserHelper;
 import model.Account;
@@ -34,9 +37,11 @@ import model.Customer;
 import model.Employee;
 import model.Transaction;
 import model.User;
+import utilities.ProtoUtils;
 import utilities.Sha_256;
 import utilities.Utilities;
 import utilities.Validators;
+import yamlConvertor.YamlMapper;
 
 public class MainController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -51,6 +56,17 @@ public class MainController extends HttpServlet {
 			break;
 		}
 		case "/pages/home": {
+
+			Cookie[] cookies = request.getCookies();
+			if (cookies != null) {
+				for (Cookie cookie : cookies) {
+					if (cookie.getName().equals("JSESSIONID")) {
+						String sessionId = cookie.getValue();
+						System.out.println("JSession ID : " + sessionId);
+					}
+				}
+			}
+
 			Audit audit = new Audit();
 			long currentTime = Utilities.getCurrentTime();
 			try {
@@ -63,7 +79,11 @@ public class MainController extends HttpServlet {
 				String password = request.getParameter("password");
 				UserHelper userHelper = new UserHelper();
 				User user = userHelper.getUser(userId, password);
+
 				HttpSession session = request.getSession(true);
+
+				System.out.println("HttpSession : " + session.getId());
+
 				password = user.getPassword();
 				session.setAttribute("userId", userId);
 				session.setAttribute("userName", user.getName());
@@ -88,12 +108,11 @@ public class MainController extends HttpServlet {
 				audit.setDescription("Login failed!");
 				request.setAttribute("warning", ex.getMessage());
 				request.getRequestDispatcher("/pages/login").forward(request, response);
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -195,7 +214,8 @@ public class MainController extends HttpServlet {
 						request.getRequestDispatcher("/WEB-INF/pages/changePassword.jsp").forward(request, response);
 						break;
 					}
-					Validators.validatePassword(newPassword, "Password should contain minimum 8 characters, 1 uppercase alphabet, 1 lowercase alphabet, 1 number and 1 special character");
+					Validators.validatePassword(newPassword,
+							"Password should contain minimum 8 characters, 1 uppercase alphabet, 1 lowercase alphabet, 1 number and 1 special character");
 					userHelper.changePassword(newPassword, userId, currentTime, userId);
 					request.setAttribute("success-info", "Password changed successfully!");
 					audit.setDescription("Password changed successfully!");
@@ -207,13 +227,11 @@ public class MainController extends HttpServlet {
 					request.setAttribute("failure-info", ex.getMessage());
 					request.getRequestDispatcher("/WEB-INF/pages/changePassword.jsp").forward(request, response);
 					break;
-				}
-				finally {
+				} finally {
 					try {
 						AuditHelper auditHelper = new AuditHelper();
 						auditHelper.insertAudit(audit);
-					}
-					catch(CustomBankException ex) {
+					} catch (CustomBankException ex) {
 						ex.printStackTrace();
 					}
 				}
@@ -253,7 +271,8 @@ public class MainController extends HttpServlet {
 			audit.setAction("Withdraw");
 			audit.setUserId(userId);
 			try {
-				if (selectedAccountString == null || selectedAccountString.equals("null") || selectedAccountString.equals("")) {
+				if (selectedAccountString == null || selectedAccountString.equals("null")
+						|| selectedAccountString.equals("")) {
 					throw new CustomBankException("Please select Account!");
 				} else if (amountString == null) {
 					throw new CustomBankException("Please enter amount!");
@@ -277,13 +296,11 @@ public class MainController extends HttpServlet {
 				System.out.println("in catch block of /pages/user/doWithdraw...");
 				request.setAttribute("failure-info", ex.getMessage());
 				request.getRequestDispatcher("/pages/user/withdraw").forward(request, response);
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}
-				catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -346,12 +363,11 @@ public class MainController extends HttpServlet {
 				System.out.println("in catch block of /pages/user/doDeposit...");
 				request.setAttribute("failure-info", ex.getMessage());
 				request.getRequestDispatcher("/pages/user/deposit").forward(request, response);
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -394,7 +410,7 @@ public class MainController extends HttpServlet {
 			audit.setTime(currentTime);
 			audit.setAction("Inter bank Transfer");
 			audit.setUserId(userId);
-			
+
 			try {
 				if (selectedAccountString == null || selectedAccountString.equals("null")) {
 					throw new CustomBankException("Please select Account!");
@@ -410,9 +426,17 @@ public class MainController extends HttpServlet {
 					description = "";
 				}
 				new UserHelper().checkPassword(userId, passwordString);
+
 				long selectedAccount = Long.parseLong(selectedAccountString);
 				long recipientAccount = Long.parseLong(recipientAccountNo);
 				double amount = Double.parseDouble(amountString);
+
+				String jsonData = ProtoUtils.getInterBankData(selectedAccount, recipientAccount, recipientIfsc, description,
+						amount);
+				System.out.println(jsonData);
+				String responseString = makeRequestToOtherBank(jsonData, recipientIfsc);
+				JSONObject responseJsonObj = new JSONObject(responseString);
+				
 				TransactionHelper transactionHelper = new TransactionHelper();
 				Transaction transaction = new Transaction();
 				transaction.setAccountNo(selectedAccount);
@@ -424,8 +448,14 @@ public class MainController extends HttpServlet {
 				transaction.setType(TransactionType.DEBIT.getType());
 				transaction.setLastModifiedBy(userId);
 				transaction.setLastModifiedOn(currentTime);
-
+				
+				if(!"success".equalsIgnoreCase((String)responseJsonObj.get("status"))) {
+					transaction.setStatusFromEnum(TransactionStatus.FAILURE);
+					transactionHelper.makeBankTransaction(transaction, true);
+					throw new CustomBankException("Transaction failed! " + responseJsonObj.get("message"));
+				}
 				long referenceNo = transactionHelper.makeBankTransaction(transaction, true);
+
 				audit.setStatus("success");
 				audit.setDescription("Transaction Successful!");
 				request.setAttribute("success-info", "Transaction Successful!");
@@ -437,13 +467,18 @@ public class MainController extends HttpServlet {
 				System.out.println("in catch block of /pages/user/do-inter-bank-transfer...");
 				request.setAttribute("failure-info", ex.getMessage());
 				request.getRequestDispatcher("/pages/user/inter-bank-transfer").forward(request, response);
+			}catch(Exception ex) {
+				audit.setStatus("failure");
+				audit.setDescription(ex.getMessage());
+				System.out.println("in catch block of /pages/user/do-inter-bank-transfer...");
+				request.setAttribute("failure-info", "Internal server problem! Try again later!");
+				request.getRequestDispatcher("/pages/user/inter-bank-transfer").forward(request, response);
 			}
 			finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}
-				catch (CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -527,12 +562,11 @@ public class MainController extends HttpServlet {
 				System.out.println("in catch block of /pages/user/do-intra-bank-transfer...");
 				request.setAttribute("failure-info", ex.getMessage());
 				request.getRequestDispatcher("/pages/user/intra-bank-transfer").forward(request, response);
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -543,7 +577,7 @@ public class MainController extends HttpServlet {
 		case "/pages/admin/transactionHistory": {
 			HttpSession session = request.getSession(false);
 			long currentTime = Utilities.getCurrentTime();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
 			audit.setAction("View Transaction History");
@@ -553,13 +587,12 @@ public class MainController extends HttpServlet {
 				if (path.startsWith("/pages/user")) {
 					request.setAttribute("page_type", "customerTransactionHistory");
 					setCustomerAccounts(request, response);
-				}
-				else {
+				} else {
 					request.setAttribute("page_type", "manage-transactions");
-					request.setAttribute("page_name", "transactionHistory");					
+					request.setAttribute("page_name", "transactionHistory");
 				}
-				if(request.getAttribute("failure-info") != null) {
-					throw new CustomBankException((String)request.getAttribute("failure-info"));
+				if (request.getAttribute("failure-info") != null) {
+					throw new CustomBankException((String) request.getAttribute("failure-info"));
 				}
 				String selectedAccountString = request.getParameter("selectedAccount");
 				String fromDateString = request.getParameter("fromDate");
@@ -579,12 +612,11 @@ public class MainController extends HttpServlet {
 				request.setAttribute("selected-page", page);
 				AccountHelper accountHelper = new AccountHelper();
 				Account currAccount = accountHelper.getAccount(selectedAccount);
-				if(currAccount == null) {
+				if (currAccount == null) {
 					throw new CustomBankException("Account not found!!");
 				}
 				TransactionHelper helper = new TransactionHelper();
-				int totalNoOfTransactions = helper.getNoOfTransactions(selectedAccount, fromDate,
-						toDate + (86400000l));
+				int totalNoOfTransactions = helper.getNoOfTransactions(selectedAccount, fromDate, toDate + (86400000l));
 				if (totalNoOfTransactions == 0) {
 					throw new CustomBankException("No transactions found");
 				}
@@ -611,12 +643,12 @@ public class MainController extends HttpServlet {
 				} else {
 					request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
 				}
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
-					if(!audit.getDescription().equals(""))auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex) {
+					if (!audit.getDescription().equals(""))
+						auditHelper.insertAudit(audit);
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -652,11 +684,9 @@ public class MainController extends HttpServlet {
 				customer.setDob(newUserDobInMillis);
 				customer.setAadhar(newUserAadhar);
 				customer.setPan(newUserPan);
-				
-				customer.setLastModifiedBy((int)session.getAttribute("userId"));
+
+				customer.setLastModifiedBy((int) session.getAttribute("userId"));
 				customer.setLastModifiedOn(currentTime);
-				
-				
 
 				CustomerHelper customerHelper = new CustomerHelper();
 				int newUserId = customerHelper.addCustomer(customer);
@@ -679,12 +709,11 @@ public class MainController extends HttpServlet {
 				} else {
 					request.getRequestDispatcher("/pages/employee/home").forward(request, response);
 				}
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -739,12 +768,11 @@ public class MainController extends HttpServlet {
 				request.removeAttribute("success-message");
 				request.setAttribute("failure-message", ex.getMessage());
 				request.getRequestDispatcher("/pages/admin/home").forward(request, response);
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -753,7 +781,7 @@ public class MainController extends HttpServlet {
 		case "/pages/admin/getUser": {
 			HttpSession session = request.getSession();
 			long currentTime = Utilities.getCurrentTime();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
 			audit.setAction("View User");
@@ -791,13 +819,11 @@ public class MainController extends HttpServlet {
 				request.setAttribute("page_type", "manage-user");
 				request.setAttribute("page_name", "viewUser");
 				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
-					auditHelper.insertAudit(audit);					
-				}
-				catch(CustomBankException ex) {
+					auditHelper.insertAudit(audit);
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -806,7 +832,7 @@ public class MainController extends HttpServlet {
 		case "/pages/employee/getUser": {
 			HttpSession session = request.getSession();
 			long currentTime = Utilities.getCurrentTime();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
 			audit.setAction("View User");
@@ -842,13 +868,11 @@ public class MainController extends HttpServlet {
 				request.setAttribute("page_type", "manage-user");
 				request.setAttribute("page_name", "viewUser");
 				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
-					auditHelper.insertAudit(audit);					
-				}
-				catch (CustomBankException ex) {
+					auditHelper.insertAudit(audit);
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -858,7 +882,7 @@ public class MainController extends HttpServlet {
 		case "/pages/admin/updateUserDetails": {
 			HttpSession session = request.getSession(false);
 			long currentTime = Utilities.getCurrentTime();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
 			audit.setAction("Update User");
@@ -886,7 +910,7 @@ public class MainController extends HttpServlet {
 					currCustomer.setDob((Utilities.getDateInMillis(currDob)));
 					currCustomer.setStatus(UserStatus.valueOf(currStatus).getStatus());
 					currCustomer.setType(UserType.valueOf(currType).getType());
-					currCustomer.setLastModifiedBy((int)session.getAttribute("userId"));
+					currCustomer.setLastModifiedBy((int) session.getAttribute("userId"));
 					currCustomer.setLastModifiedOn(Utilities.getCurrentTime());
 					currCustomer.setAadhar(currAadhar);
 					currCustomer.setPan(currPan);
@@ -911,7 +935,7 @@ public class MainController extends HttpServlet {
 					currEmployee.setSalary(currSalary);
 					currEmployee.setJoiningDate(joiningDate);
 					currEmployee.setBranchId(currBranchId);
-					currEmployee.setLastModifiedBy((int)session.getAttribute("userId"));
+					currEmployee.setLastModifiedBy((int) session.getAttribute("userId"));
 					currEmployee.setLastModifiedOn(currentTime);
 					EmployeeHelper helper = new EmployeeHelper();
 					helper.updateEmployee(currEmployee, currUserId);
@@ -930,12 +954,11 @@ public class MainController extends HttpServlet {
 				request.setAttribute("page_type", "manage-user");
 				request.setAttribute("page_name", "viewUser");
 				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -944,7 +967,7 @@ public class MainController extends HttpServlet {
 		case "/pages/employee/updateUserDetails": {
 			HttpSession session = request.getSession(false);
 			long currentTime = Utilities.getCurrentTime();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
 			audit.setAction("Update User");
@@ -972,7 +995,7 @@ public class MainController extends HttpServlet {
 				currCustomer.setDob((Utilities.getDateInMillis(currDob)));
 				currCustomer.setStatus(UserStatus.valueOf(currStatus).getStatus());
 				currCustomer.setType(UserType.valueOf(currType).getType());
-				currCustomer.setLastModifiedBy((int)session.getAttribute("userId"));
+				currCustomer.setLastModifiedBy((int) session.getAttribute("userId"));
 				currCustomer.setLastModifiedOn(currentTime);
 				currCustomer.setAadhar(currAadhar);
 				currCustomer.setPan(currPan);
@@ -988,12 +1011,11 @@ public class MainController extends HttpServlet {
 				audit.setDescription("Updation failed! Exception:" + ex.getMessage());
 				request.setAttribute("edit-result", ex.getMessage());
 				request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -1021,7 +1043,7 @@ public class MainController extends HttpServlet {
 		case "/pages/employee/addAccount": {
 			HttpSession session = request.getSession(false);
 			long currentTime = Utilities.getCurrentTime();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
 			audit.setAction("Add Account");
@@ -1047,12 +1069,13 @@ public class MainController extends HttpServlet {
 				newAccount.setBranchId(branchId);
 				newAccount.setCustomerId(customerId);
 				newAccount.setLastModifiedOn(currentTime);
-				newAccount.setLastModifiedBy((int)session.getAttribute("userId"));
+				newAccount.setLastModifiedBy((int) session.getAttribute("userId"));
 				newAccount.setStatus(AccountStatus.ACTIVE.getStatus());
 				long newAddedAccountNumber = accountHelper.addAccount(newAccount);
 				audit.setStatus("success");
 				audit.setDescription("Account added successfully! Acc:no :" + newAddedAccountNumber);
-				request.setAttribute("success", "Account added successfully! Account Number : " + newAddedAccountNumber);
+				request.setAttribute("success",
+						"Account added successfully! Account Number : " + newAddedAccountNumber);
 				if (path.startsWith("/pages/admin")) {
 					request.getRequestDispatcher("/pages/admin/manage-accounts").forward(request, response);
 				} else {
@@ -1067,13 +1090,11 @@ public class MainController extends HttpServlet {
 				} else {
 					request.getRequestDispatcher("/pages/employee/manage-accounts").forward(request, response);
 				}
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}
-				catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -1092,7 +1113,7 @@ public class MainController extends HttpServlet {
 		case "/pages/employee/viewAccount": {
 			HttpSession session = request.getSession(false);
 			long currentTime = Utilities.getCurrentTime();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
 			audit.setAction("View Account");
@@ -1125,12 +1146,11 @@ public class MainController extends HttpServlet {
 				} else {
 					request.getRequestDispatcher("/pages/employee/getAccount").forward(request, response);
 				}
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -1141,7 +1161,7 @@ public class MainController extends HttpServlet {
 		case "/pages/employee/changeStatus": {
 			HttpSession session = request.getSession(false);
 			long currentTime = Utilities.getCurrentTime();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setTime(currentTime);
 			audit.setAction("Change Account Status");
@@ -1153,10 +1173,10 @@ public class MainController extends HttpServlet {
 				String statusString = request.getParameter("status");
 				AccountHelper accountHelper = new AccountHelper();
 				if (statusString.equals(AccountStatus.ACTIVE.toString())) {
-					accountHelper.inActivateAccount(accountNo, currentTime, (int)session.getAttribute("userId"));
+					accountHelper.inActivateAccount(accountNo, currentTime, (int) session.getAttribute("userId"));
 					audit.setDescription("Account Deactivated successfully!");
 				} else {
-					accountHelper.activateAccount(accountNo, currentTime, (int)session.getAttribute("userId"));
+					accountHelper.activateAccount(accountNo, currentTime, (int) session.getAttribute("userId"));
 					audit.setDescription("Account activated Successfully!");
 				}
 				audit.setStatus("success");
@@ -1176,12 +1196,11 @@ public class MainController extends HttpServlet {
 				} else {
 					request.getRequestDispatcher("/pages/employee/getAccount").forward(request, response);
 				}
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -1225,11 +1244,11 @@ public class MainController extends HttpServlet {
 			String passwordString = request.getParameter("password");
 			Audit audit = new Audit();
 			try {
-			int userId = Utilities.getInteger(session.getAttribute("userId"), "userID invalid!");
-			long currentTime = Utilities.getCurrentTime();
-			audit.setTime(currentTime);
-			audit.setAction("Admin Deposit");
-			audit.setUserId(userId);
+				int userId = Utilities.getInteger(session.getAttribute("userId"), "userID invalid!");
+				long currentTime = Utilities.getCurrentTime();
+				audit.setTime(currentTime);
+				audit.setAction("Admin Deposit");
+				audit.setUserId(userId);
 				if (selectedAccountString == null || selectedAccountString.equals("null")) {
 					throw new CustomBankException("Please enter Account!");
 				} else if (amountString == null) {
@@ -1261,13 +1280,11 @@ public class MainController extends HttpServlet {
 				System.out.println("in catch block of /pages/admin/doDeposit...");
 				request.setAttribute("failure-info", ex.getMessage());
 				request.getRequestDispatcher("/pages/admin/deposit").forward(request, response);
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}
-				catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -1280,7 +1297,7 @@ public class MainController extends HttpServlet {
 			String amountString = request.getParameter("amount");
 			String passwordString = request.getParameter("password");
 			long currentTime = Utilities.getCurrentTime();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setAction("Employee depoit to User");
 			audit.setUserId(userId);
@@ -1303,10 +1320,11 @@ public class MainController extends HttpServlet {
 				}
 				double amount = Double.parseDouble(amountString);
 				if (account.getStatus() == AccountStatus.INACTIVE.getStatus()) {
-					accountHelper.activateAccount(selectedAccount, currentTime, (int)session.getAttribute("userId"));
+					accountHelper.activateAccount(selectedAccount, currentTime, (int) session.getAttribute("userId"));
 				}
 				TransactionHelper transactionHelper = new TransactionHelper();
-				transactionHelper.depositAmount(selectedAccount, amount, currentTime, (int)session.getAttribute("userId"));
+				transactionHelper.depositAmount(selectedAccount, amount, currentTime,
+						(int) session.getAttribute("userId"));
 				audit.setStatus("success");
 				audit.setDescription("Employee Depositing to Account successful!");
 				request.setAttribute("success-info", "Deposit successful!");
@@ -1317,16 +1335,15 @@ public class MainController extends HttpServlet {
 				System.out.println("in catch block of /pages/employee/doDeposit...");
 				request.setAttribute("failure-info", ex.getMessage());
 				request.getRequestDispatcher("/pages/employee/deposit").forward(request, response);
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
-			
+
 			break;
 		}
 
@@ -1352,13 +1369,13 @@ public class MainController extends HttpServlet {
 			break;
 		}
 		case "/pages/admin/doWithdraw":
-		case "/pages/employee/doWithdraw":{
+		case "/pages/employee/doWithdraw": {
 			HttpSession session = request.getSession(false);
 			String selectedAccountString = request.getParameter("selected-account");
 			String amountString = request.getParameter("amount");
 			String passwordString = request.getParameter("password");
 			long currentTime = Utilities.getCurrentTime();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			Audit audit = new Audit();
 			audit.setUserId(userId);
 			audit.setTime(currentTime);
@@ -1381,14 +1398,14 @@ public class MainController extends HttpServlet {
 					throw new CustomBankException("No account found!");
 				}
 				TransactionHelper transactionHelper = new TransactionHelper();
-				transactionHelper.withdrawAmount(selectedAccount, amount, currentTime, (int)session.getAttribute("userId"));
+				transactionHelper.withdrawAmount(selectedAccount, amount, currentTime,
+						(int) session.getAttribute("userId"));
 				audit.setStatus("success");
 				audit.setDescription("Employee withdraw from account success!!");
 				request.setAttribute("success-info", "Withdraw successful! Please collect your cash!");
-				if(path.startsWith("/pages/admin")) {
-					request.getRequestDispatcher("/pages/admin/withdraw").forward(request, response);					
-				}
-				else {
+				if (path.startsWith("/pages/admin")) {
+					request.getRequestDispatcher("/pages/admin/withdraw").forward(request, response);
+				} else {
 					request.getRequestDispatcher("/pages/employee/withdraw").forward(request, response);
 				}
 			} catch (CustomBankException ex) {
@@ -1396,80 +1413,75 @@ public class MainController extends HttpServlet {
 				audit.setDescription("Employee withdraw failed! Exception:" + ex.getMessage());
 				System.out.println("in catch block of /pages/admin/doWithdraw...");
 				request.setAttribute("failure-info", ex.getMessage());
-				if(path.startsWith("/pages/admin")) {
-					request.getRequestDispatcher("/pages/admin/withdraw").forward(request, response);					
-				}
-				else {
+				if (path.startsWith("/pages/admin")) {
+					request.getRequestDispatcher("/pages/admin/withdraw").forward(request, response);
+				} else {
 					request.getRequestDispatcher("/pages/employee/withdraw").forward(request, response);
 				}
-			}
-			finally {
+			} finally {
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex) {
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
 			break;
 		}
-		
+
 		case "/pages/admin/manage-apis":
-		case "/pages/employee/manage-apis":{
+		case "/pages/employee/manage-apis": {
 			HttpSession session = request.getSession();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			request.setAttribute("page_type", "manage-apis");
 			request.setAttribute("page_name", "apiPage");
 			ApiHelper apiHelper = new ApiHelper();
 			try {
-			List<ApiData> datas = apiHelper.getUserApiList(userId);
-			request.setAttribute("apiDatas", datas);
-			}catch (CustomBankException e) {
+				List<ApiData> datas = apiHelper.getUserApiList(userId);
+				request.setAttribute("apiDatas", datas);
+			} catch (CustomBankException e) {
 				request.setAttribute("api-failure", e.getMessage());
 			}
 			request.getRequestDispatcher("/WEB-INF/pages/employeeHome.jsp").forward(request, response);
 			break;
 		}
-		
+
 		case "/pages/admin/addReadApi":
-		case "/pages/employee/addReadApi":{
+		case "/pages/employee/addReadApi": {
 			HttpSession session = request.getSession();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			ApiHelper apiHelper = new ApiHelper();
 			apiHelper.addReadApi(userId);
-			if(path.equals("/pages/employee/addReadApi")) {
+			if (path.equals("/pages/employee/addReadApi")) {
 				request.getRequestDispatcher("/pages/employee/manage-apis").forward(request, response);
-			}
-			else {
+			} else {
 				request.getRequestDispatcher("/pages/admin/manage-apis").forward(request, response);
 			}
 			break;
 		}
-		
+
 		case "/pages/employee/addWriteApi":
-		case "/pages/admin/addWriteApi":{
+		case "/pages/admin/addWriteApi": {
 			HttpSession session = request.getSession();
-			int userId = (int)session.getAttribute("userId");
+			int userId = (int) session.getAttribute("userId");
 			ApiHelper apiHelper = new ApiHelper();
 			apiHelper.addWriteApi(userId);
-			if(path.equals("/pages/employee/addWriteApi")) {
+			if (path.equals("/pages/employee/addWriteApi")) {
 				request.getRequestDispatcher("/pages/employee/manage-apis").forward(request, response);
-			}
-			else {
+			} else {
 				request.getRequestDispatcher("/pages/admin/manage-apis").forward(request, response);
 			}
 			break;
 		}
-		
+
 		case "/pages/employee/removeApiKey":
-		case "/pages/admin/removeApiKey":{
+		case "/pages/admin/removeApiKey": {
 			String apiKey = request.getParameter("apiKey");
 			ApiHelper apiHelper = new ApiHelper();
 			apiHelper.removeApiKey(apiKey);
-			if(path.equals("/pages/employee/removeApiKey")) {
+			if (path.equals("/pages/employee/removeApiKey")) {
 				request.getRequestDispatcher("/pages/employee/manage-apis").forward(request, response);
-			}
-			else {
+			} else {
 				request.getRequestDispatcher("/pages/admin/manage-apis").forward(request, response);
 			}
 			break;
@@ -1486,17 +1498,17 @@ public class MainController extends HttpServlet {
 				userId = session.getAttribute("userId");
 				session.invalidate();
 			}
-			if(userId != null) {
+			if (userId != null) {
 				audit.setAction("LogOut");
-				audit.setUserId((int)userId);
-				audit.setTargetId("" + ((int)userId));
+				audit.setUserId((int) userId);
+				audit.setTargetId("" + ((int) userId));
 				audit.setStatus("success");
 				audit.setDescription("User logged out successfully");
 				audit.setTime(currentTime);
 				try {
 					AuditHelper auditHelper = new AuditHelper();
 					auditHelper.insertAudit(audit);
-				}catch(CustomBankException ex){
+				} catch (CustomBankException ex) {
 					ex.printStackTrace();
 				}
 			}
@@ -1510,6 +1522,12 @@ public class MainController extends HttpServlet {
 		}
 
 	}
+
+	private String makeRequestToOtherBank(String jsonData, String recipientIfsc) throws CustomBankException {
+		YamlMapper mapper = new YamlMapper();
+		return new RequestHelper().sendPostRequest(mapper.getBankURL(recipientIfsc), jsonData, mapper.getBankSecretKey(recipientIfsc));
+	}
+
 
 	private void setCustomerAccounts(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException, CustomBankException {

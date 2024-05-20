@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+message InterBank{
+	int64 senderAccNo = 1;
+	int64 receiverAccNo = 2;
+	double amount = 3;
+	string description = 4;
+	string ifsc = 5;
+}

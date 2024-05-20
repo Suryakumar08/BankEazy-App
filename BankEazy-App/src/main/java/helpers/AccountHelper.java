@@ -9,6 +9,8 @@ import org.json.JSONObject;
 
 import com.cache.ICache;
 import com.dynamicManager.DynamicManager;
+import com.proxies.IDataRetriever;
+import com.proxies.ProxyBuilder;
 
 import daos.AccountDaoInterface;
 import enums.AccountStatus;
@@ -21,6 +23,7 @@ public class AccountHelper {
 
 	private static AccountDaoInterface accountDao = null;
 	private static ICache<Long, Account> accountCache = null;
+	private static IDataRetriever dataRetriever = null;
 
 	@SuppressWarnings("unchecked")
 	public AccountHelper() throws CustomBankException {
@@ -36,11 +39,13 @@ public class AccountHelper {
 				accountDao = (AccountDaoInterface) accDao.newInstance();
 			}
 
-			if(accountCache == null) {
+			if (accountCache == null) {
 				AccountCacheClass = Class.forName(DynamicManager.getAccountCachePath());
 				accountCacheConstructor = AccountCacheClass.getDeclaredConstructor(int.class);
-				accountCache = (ICache<Long, Account>) accountCacheConstructor.newInstance(6379);				
+				accountCache = (ICache<Long, Account>) accountCacheConstructor.newInstance(6379);
 			}
+
+//			dataRetriever = ProxyBuilder.createAccountProxy(accountDao);
 
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
 				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -70,6 +75,9 @@ public class AccountHelper {
 	}
 
 	public Account getAccount(long accountNo) throws CustomBankException {
+
+//		return dataRetriever.getAccount(accountNo);
+
 		Account resultAccount;
 		if ((resultAccount = accountCache.get(accountNo)) != null) {
 			return resultAccount;
@@ -149,10 +157,24 @@ public class AccountHelper {
 		return updateAccount(account);
 	}
 
+	public void updateCacheBalance(long accountNo, double newBalance) throws CustomBankException {
+		try {
+			Account tempAccount = accountCache.get(accountNo);
+			if (tempAccount != null) {
+				tempAccount.setBalance(newBalance);
+				accountCache.set(accountNo, tempAccount);
+			}
+		} catch (CustomBankException ex) {
+		}
+	}
+
 	public boolean updateAccount(Account account) throws CustomBankException {
 		Validators.checkNull(account);
 		Validators.checkNull(account.getAccountNo());
-		accountCache.remove(account.getAccountNo());
+		try {
+			accountCache.remove(account.getAccountNo());
+		} catch (CustomBankException ex) {
+		}
 		return accountDao.updateAccount(account);
 	}
 
