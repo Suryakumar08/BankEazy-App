@@ -9,8 +9,6 @@ import org.json.JSONObject;
 
 import com.cache.ICache;
 import com.dynamicManager.DynamicManager;
-import com.proxies.IDataRetriever;
-import com.proxies.ProxyBuilder;
 
 import daos.AccountDaoInterface;
 import enums.AccountStatus;
@@ -23,7 +21,6 @@ public class AccountHelper {
 
 	private static AccountDaoInterface accountDao = null;
 	private static ICache<Long, Account> accountCache = null;
-	private static IDataRetriever dataRetriever = null;
 
 	@SuppressWarnings("unchecked")
 	public AccountHelper() throws CustomBankException {
@@ -45,7 +42,6 @@ public class AccountHelper {
 				accountCache = (ICache<Long, Account>) accountCacheConstructor.newInstance(6379);
 			}
 
-//			dataRetriever = ProxyBuilder.createAccountProxy(accountDao);
 
 		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException
 				| IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -75,8 +71,6 @@ public class AccountHelper {
 	}
 
 	public Account getAccount(long accountNo) throws CustomBankException {
-
-//		return dataRetriever.getAccount(accountNo);
 
 		Account resultAccount;
 		if ((resultAccount = accountCache.get(accountNo)) != null) {

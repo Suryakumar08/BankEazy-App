@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import exception.CustomBankException;
+import utilities.Validators;
 
 public class YamlMapper {
 	private static ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -95,6 +96,7 @@ public class YamlMapper {
 	}
 	
 	public String getBankURL(String ifsc) throws CustomBankException{
+		Validators.validateIFSC(ifsc);
 		String ifscFinder = ifsc.substring(0, 4);
 		Map<String, String> bankDetails = ifscMap.get(ifscFinder);
 		if(bankDetails == null) {
@@ -104,12 +106,24 @@ public class YamlMapper {
 	}
 	
 	public String getBankSecretKey(String ifsc) throws CustomBankException{
+		Validators.validateIFSC(ifsc);
 		String ifscFinder = ifsc.substring(0, 4);
 		Map<String, String> bankDetails = ifscMap.get(ifscFinder);
 		if(bankDetails == null) {
 			throw new CustomBankException("No Bank found!");
 		}
 		return bankDetails.get("secretkey");
+	}
+	
+	public String getBankIp(String bank_id) throws CustomBankException{
+		if(bank_id.length() < 4) {
+			throw new CustomBankException("IFSC invalid!");
+		}
+		Map<String,String> bankDetails = ifscMap.get(bank_id);
+		if(bankDetails == null) {
+			throw new CustomBankException("No Bank Found");
+		}
+		return bankDetails.get("ip");
 	}
 	
 }

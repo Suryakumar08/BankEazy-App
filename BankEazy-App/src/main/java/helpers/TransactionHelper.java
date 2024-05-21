@@ -99,6 +99,10 @@ public class TransactionHelper {
 		if(account.getStatus() == AccountStatus.INACTIVE.getStatus()) {
 			throw new CustomBankException("Account is inactive!");
 		}
+
+		if(!(new BranchHelper().getBranch(account.getBranchId())).getIfsc().equals(currTransaction.getIfsc())) {
+			throw new CustomBankException("Invalid IFSC!");
+		}
 		int userId = account.getCustomerId();
 		audit.setUserId(userId);
 		transaction.setCustomerId(userId);

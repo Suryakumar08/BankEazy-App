@@ -43,10 +43,10 @@ public class RequestHelper {
     }
 	
 	
-	@SuppressWarnings("finally")
 	public String sendPostRequest(String urlString, String jsonData, String secretKey) {
 		URL url;
 		String result = "";
+		HttpsURLConnection conn = null;
 		try {
 			url = new URL(urlString);
 			disableCertificateValidation();
@@ -55,7 +55,7 @@ public class RequestHelper {
 	        System.setProperty("javax.net.ssl.trustStorePassword", "surya@131419@sS");
 	        
 	        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
-			HttpsURLConnection conn = (HttpsURLConnection)url.openConnection();
+			conn = (HttpsURLConnection)url.openConnection();
 			
 			conn.setRequestProperty("Content-Type", "application/json");
 			conn.setRequestProperty("secretkey", secretKey);	//read and write scoped apikey...
@@ -69,22 +69,22 @@ public class RequestHelper {
 			System.out.println("Response Code : " + responseCode);
 			
 			try {
-				result = bodyWriter(conn);
+				result = bodyReader(conn);
 				System.out.println("Result from Request Helper ::: " + result);
 			} catch (CustomBankException e) {
 				e.printStackTrace();
 			}
-		
-			conn.disconnect();
+			
 		}catch(IOException ex) {
 			ex.printStackTrace();
 		}
 		finally {
-			return result;
+			conn.disconnect();
 		}
+		return result;		
 	}
 
-	private String bodyWriter(HttpsURLConnection conn) throws CustomBankException{
+	private String bodyReader(HttpsURLConnection conn) throws CustomBankException{
 		StringBuilder result = new StringBuilder();
 		try(BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))){
 			String line;

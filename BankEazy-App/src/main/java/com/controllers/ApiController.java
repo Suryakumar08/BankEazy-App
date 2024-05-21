@@ -23,8 +23,10 @@ import model.Employee;
 import model.Transaction;
 import utilities.ProtoUtils;
 import utilities.Utilities;
+import yamlConvertor.YamlMapper;
 
 public class ApiController extends HttpServlet {
+	private final String defaultIp = "0.0.0.0";
 	private static final long serialVersionUID = 1L;
 
 	public ApiController() {
@@ -36,7 +38,6 @@ public class ApiController extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		String path = request.getPathInfo();
-		JSONObject responseObject = null;
 		String blocks[] = path.split("/");
 		System.out.println("Api Controller Get method Path blocks : ");
 		for (String block : blocks) {
@@ -160,6 +161,11 @@ public class ApiController extends HttpServlet {
 				String jsonData = getDataFromReqBody(request);
 				JSONObject moneyTransferObject = new JSONObject(jsonData);
 				InterBank data = ProtoUtils.getInterBankProto(moneyTransferObject.getJSONObject("data").getString("inter_bank_data"));
+				String bank_id = moneyTransferObject.getJSONObject("data").getString("bank_id").toUpperCase();
+				String branch_ip = new YamlMapper().getBankIp(bank_id);
+				if(!branch_ip.equals(defaultIp) && !branch_ip.equals(request.getRemoteAddr())) {
+					throw new CustomBankException("Unauthenticated IP found! Request denied!");
+				}
 				TransactionHelper transactionHelper = new TransactionHelper();
 				transactionHelper.creditAmount(data);
 				responseJSON.put("status", "SUCCESS");
@@ -175,12 +181,6 @@ public class ApiController extends HttpServlet {
 			}
 		}
 	}
-
-	
-	
-	
-	
-	
 	
 	
 	private String getDataFromReqBody(HttpServletRequest request) throws CustomBankException{

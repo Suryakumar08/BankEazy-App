@@ -108,5 +108,12 @@ public class Validators {
 			throw new CustomBankException(message);
 		}
 	}
+
+	public static void validateIFSC(String ifsc) throws CustomBankException{
+		checkNull(ifsc, "Empty IFSC!");	
+		if(!ifsc.matches("^[A-Z]{4}0[0-9]{6}")) {
+			throw new CustomBankException("Invalid IFSC!!!");
+		}
+	}
 	
 }
